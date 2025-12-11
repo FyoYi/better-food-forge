@@ -1,6 +1,0 @@
-{
-  "parent": "minecraft:item/generated",
-  "textures": {
-    "layer0": "text_mod:item/sundries/ruby_copper"
-  }
-}

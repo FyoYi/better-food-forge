@@ -42,7 +42,26 @@ authors="${mod_authors}" #optional
 #displayTest="MATCH_VERSION" # if nothing is specified, MATCH_VERSION is the default when clientSideOnly=false, otherwise IGNORE_ALL_VERSION when clientSideOnly=true (#optional)
 
 # The description text for the mod (multi line!) (#mandatory)
-description='''${mod_description}'''
+description='''
+项目主页: https://github.com/FyoYi/better-food-forge
+
+Better Food (原 Text Mod) - v0.1.0 更新日志:
+
+1. 核心重构
+   - 实装时间戳腐烂系统，彻底解决手持抖动问题。
+   - 优化服务器性能，支持背包、箱子、掉落物全场景腐烂。
+
+2. 交互优化
+   - 右键堆叠：现在右键同类食物可自动合并并平均保质期。
+   - 修复了客户端同步导致的幽灵物品 Bug。
+
+3. 视觉效果
+   - 新增耐久条显示新鲜度。
+   - 物品提示(Tooltip)新增具体的保质期倒计时。
+
+4. 开发者功能
+   - 添加指令 /betterfood decay 和 pause 用于调试。
+'''
 # A dependency - use the . to indicate dependency for a specific modid. Dependencies are optional.
 [[dependencies.${mod_id}]] #optional
     # the modid of the dependency
