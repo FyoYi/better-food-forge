@@ -2,9 +2,12 @@ package com.fyoyi.betterfood;
 
 import com.fyoyi.betterfood.creative_tab.ModCreativeModeTabs;
 import com.fyoyi.betterfood.item.ModItems;
+// === 核心工具类引用 ===
 import com.fyoyi.betterfood.util.FreshnessHelper;
 import com.fyoyi.betterfood.util.TimeManager;
-import com.fyoyi.betterfood.config.FoodConfig;
+import com.fyoyi.betterfood.util.FoodExpiryManager; // JSON 读取器
+import com.fyoyi.betterfood.config.FoodConfig;     // 配置中心
+// ====================
 import net.minecraft.network.chat.Component;
 import net.minecraft.ChatFormatting;
 import net.minecraft.world.item.Item;
@@ -17,6 +20,7 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.RegisterItemDecorationsEvent;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.event.AddReloadListenerEvent; // 必须导入这个
 import net.minecraftforge.event.BuildCreativeModeTabContentsEvent;
 import net.minecraftforge.event.server.ServerStartingEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
@@ -43,16 +47,22 @@ public class better_food
 
         modEventBus.addListener(this::commonSetup);
 
+        // 注册物品、实体、配方等
         ModItems.init();
         ModItems.register(modEventBus);
         ModRecipes.register(modEventBus);
         ModEntities.register(modEventBus);
         ModCreativeModeTabs.register(modEventBus);
 
+        // 注册服务端事件总线
         MinecraftForge.EVENT_BUS.register(this);
+
+        // >>> 【核心】注册资源重载监听器 (用于读取 JSON 配置) <<<
+        MinecraftForge.EVENT_BUS.addListener(this::addReloadListener);
+
         modEventBus.addListener(this::addCreative);
 
-        // 手动注册装饰器
+        // 手动注册物品栏装饰器 (画耐久条)
         modEventBus.addListener(ClientModEvents::registerItemDecorations);
 
         context.registerConfig(ModConfig.Type.COMMON, Config.SPEC);
@@ -67,6 +77,12 @@ public class better_food
         Config.items.forEach((item) -> LOGGER.info("ITEM >> {}", item.toString()));
     }
 
+    // === 【新增】事件回调：添加 JSON 读取器 ===
+    public void addReloadListener(AddReloadListenerEvent event) {
+        // 注册我们的 FoodExpiryManager，它会在游戏启动和 /reload 时读取数据包
+        event.addListener(new FoodExpiryManager());
+    }
+
     private void addCreative(BuildCreativeModeTabContentsEvent event)
     {
     }
@@ -78,7 +94,7 @@ public class better_food
     }
 
     // =================================================================
-    // 客户端事件内部类
+    // 客户端事件内部类 (负责渲染和提示)
     // =================================================================
     @Mod.EventBusSubscriber(modid = MOD_ID, value = Dist.CLIENT, bus = Mod.EventBusSubscriber.Bus.FORGE)
     public static class ClientModEvents
@@ -100,43 +116,44 @@ public class better_food
         }
 
         // ========================================================
-        // 功能 1：Tooltip (显示保质期文字) - 已修改支持全新物品
+        // 功能 1：Tooltip (显示保质期文字)
         // ========================================================
         @SubscribeEvent
         public static void onItemTooltip(net.minecraftforge.event.entity.player.ItemTooltipEvent event) {
             net.minecraft.world.item.ItemStack stack = event.getItemStack();
 
-            // 只要腐烂开启，且是可腐烂食物，就显示！
+            // 只要腐烂开启，且是可腐烂食物 (FoodConfig 判断)，就显示
             if (TimeManager.DECAY_ENABLED && FoodConfig.canRot(stack)) {
+
+                // 1. 获取总寿命 (从 JSON 配置或默认值获取)
+                long lifetime = FoodConfig.getItemLifetime(stack);
+
+                // === 如果是无限保质期 (-1)，显示特殊文字并直接返回 ===
+                if (lifetime == FoodConfig.SHELF_LIFE_INFINITE) {
+                    event.getToolTip().add(Component.literal("保质期: 永久保鲜").withStyle(ChatFormatting.GOLD));
+                    return; // 不需要显示倒计时
+                }
 
                 net.minecraft.world.level.Level level = event.getEntity() != null ? event.getEntity().level() : null;
                 if (level == null) return;
 
-                // 1. 总是显示总保质期 (蓝色)
-                long lifetime = FoodConfig.getItemLifetime(stack);
+                // 2. 正常显示保质期
                 String lifeStr = FreshnessHelper.formatDuration(lifetime);
                 event.getToolTip().add(Component.literal("保质期: " + lifeStr).withStyle(ChatFormatting.BLUE));
 
-                // 2. 计算剩余时间
+                // 3. 计算剩余时间
+                long expiry = FreshnessHelper.getExpiryTime(level, stack, false);
                 long remaining;
 
-                // 尝试获取过期时间 (只读)
-                long expiry = FreshnessHelper.getExpiryTime(level, stack, false);
-
                 if (expiry == Long.MAX_VALUE) {
-                    // 情况 A: 物品是全新的 (没有NBT标签)
-                    // 剩余时间 = 总寿命
-                    remaining = lifetime;
+                    remaining = lifetime; // 全新
                 } else {
-                    // 情况 B: 物品已经开始腐烂
                     long now = TimeManager.getEffectiveTime(level);
                     remaining = Math.max(0, expiry - now);
                 }
 
-                // 3. 显示距离腐烂
+                // 4. 显示倒计时
                 String remainStr = FreshnessHelper.formatDuration(remaining);
-
-                // 动态变色 (绿 -> 黄 -> 红)
                 ChatFormatting color;
                 float percent = (float) remaining / lifetime;
 
@@ -149,22 +166,22 @@ public class better_food
         }
 
         // ========================================================
-        // 功能 2：渲染耐久条
+        // 功能 2：渲染耐久条 (新鲜度条)
         // ========================================================
         public static void registerItemDecorations(RegisterItemDecorationsEvent event) {
             System.out.println(">>> BetterFood DEBUG: 装饰器正在注册！ <<<");
 
             for (Item item : ForgeRegistries.ITEMS) {
+                // 使用 Config 检查
                 if (FoodConfig.canRot(item.getDefaultInstance())) {
 
                     event.register(item, (graphics, font, stack, x, y) -> {
                         if (Minecraft.getInstance().level == null) return false;
 
-                        // 计算百分比
+                        // 使用 Helper 计算百分比 (内部会自动处理 -1 返回 1.0)
                         float percent = FreshnessHelper.getFreshnessPercentage(Minecraft.getInstance().level, stack);
 
                         // 只有不满的时候显示条 (percent < 1.0)
-                        // 如果你是全新物品，这里 percent 是 1.0，所以不显示条，只显示文字，这是对的。
                         if (percent < 1.0F) {
                             int barWidth = Math.round(13.0F * percent);
                             int color = java.awt.Color.HSBtoRGB(percent / 3.0F, 1.0F, 1.0F);
@@ -172,7 +189,9 @@ public class better_food
                             graphics.pose().pushPose();
                             graphics.pose().translate(0, 0, 200);
 
+                            // 黑底
                             graphics.fill(x + 2, y + 13, x + 15, y + 15, 0xFF000000);
+                            // 彩条
                             graphics.fill(x + 2, y + 13, x + 2 + barWidth, y + 14, color | 0xFF000000);
 
                             graphics.pose().popPose();

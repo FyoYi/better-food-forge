@@ -1,0 +1,12 @@
+{
+  "ticks": 288000,
+  "items": [
+    "minecraft:bread",
+    "minecraft:cookie",
+    "minecraft:carrot",
+    "minecraft:potato",
+    "minecraft:baked_potato",
+    "minecraft:beetroot",
+    "minecraft:dried_kelp"
+  ]
+}

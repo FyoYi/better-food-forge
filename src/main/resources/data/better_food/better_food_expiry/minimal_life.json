@@ -1,0 +1,15 @@
+{
+  "ticks": 60000,
+  "items": [
+    "minecraft:beef",
+    "minecraft:porkchop",
+    "minecraft:chicken",
+    "minecraft:mutton",
+    "minecraft:rabbit",
+    "minecraft:cod",
+    "minecraft:salmon",
+    "minecraft:tropical_fish",
+    "minecraft:pufferfish",
+    "minecraft:spider_eye"
+  ]
+}

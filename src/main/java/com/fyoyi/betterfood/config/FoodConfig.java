@@ -8,42 +8,44 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class FoodConfig {
-    // 默认保质期 (10分钟)
-    public static final long DEFAULT_LIFETIME = 12000L;
 
-    // 特殊食物保质期表
+    public static final long TICKS_PER_DAY = 24000L;
+    public static final long SHELF_LIFE_DEFAULT = 7 * TICKS_PER_DAY;
+    public static final long SHELF_LIFE_INFINITE = -1L;
+
+    // === 预设时间常量 (分钟) ===
+    // 这里的单位是分钟，方便指令调用
+    public static final float MIN_MINUTES = (2.5f * 20); // 50分钟
+    public static final float SHORT_MINUTES = (5.0f * 20); // 100分钟
+    public static final float MEDIUM_MINUTES = (12.0f * 20); // 240分钟
+    public static final float LONG_MINUTES = (50.0f * 20); // 1000分钟
+
     private static final Map<Item, Long> CUSTOM_LIFETIMES = new HashMap<>();
 
-    static {
-        // --- 在这里配置不同食物的保质期 (需求2) ---
-        // 比如：熟肉保质期更短 (5分钟)
-        register(Items.COOKED_PORKCHOP, 6000L);
-        register(Items.COOKED_BEEF, 6000L);
-
-        // 比如：金苹果保质期极长 (1小时)
-        register(Items.GOLDEN_APPLE, 72000L);
+    public static void clear() {
+        CUSTOM_LIFETIMES.clear();
     }
 
-    private static void register(Item item, long ticks) {
+    public static void register(Item item, long ticks) {
         CUSTOM_LIFETIMES.put(item, ticks);
     }
 
-    /**
-     * 获取某个物品的保质期
-     */
-    public static long getItemLifetime(ItemStack stack) {
-        if (stack.isEmpty()) return 0;
-        // 如果表里有，就用表里的；否则用默认的
-        return CUSTOM_LIFETIMES.getOrDefault(stack.getItem(), DEFAULT_LIFETIME);
+    // === 【新增】移除配置 ===
+    public static void remove(Item item) {
+        CUSTOM_LIFETIMES.remove(item);
     }
 
-    /**
-     * 判断物品是否可以腐烂
-     */
+    public static long getItemLifetime(ItemStack stack) {
+        if (stack.isEmpty()) return 0;
+        if (CUSTOM_LIFETIMES.containsKey(stack.getItem())) {
+            return CUSTOM_LIFETIMES.get(stack.getItem());
+        }
+        return SHELF_LIFE_DEFAULT;
+    }
+
     public static boolean canRot(ItemStack stack) {
-        // 腐肉永远不腐烂
         if (stack.getItem() == Items.ROTTEN_FLESH) return false;
-        // 只有食物才腐烂 (你也可以在这里添加白名单/黑名单)
+        if (CUSTOM_LIFETIMES.containsKey(stack.getItem())) return true;
         return stack.getItem().isEdible();
     }
 }
