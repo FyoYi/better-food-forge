@@ -1,12 +1,15 @@
 {
-  "_comment": "极短保鲜食物 (20小时) - 生肉、生鱼等易腐烂食物",
+  "_comment": "极短保鲜食物 (3天) - 生肉、生鱼等易腐烂食物",
   "_comment2": "注意: 这些食物没有配置新鲜奖励，建议烹饪后食用",
 
-  "ticks": 60000,
+  "ticks": 72000,
   "items": [
     {
       "_comment": "生牛肉",
       "item": "minecraft:beef",
+      "classification": "肉类",
+      "features": ["牛肉"],
+      "nature": "生食",
       "effects": [
         {"_comment": "饱和 概率 tick 强度", "effect": "saturation", "chance": 0.1, "duration": 2, "amplifier": 0},
         {"_comment": "生命恢复 概率 时间 强度", "effect": "regeneration", "chance": 0.0, "duration": 0, "amplifier": 0},
@@ -19,6 +22,9 @@
     {
       "_comment": "生猪肉",
       "item": "minecraft:porkchop",
+      "classification": "肉类",
+      "features": ["猪肉"],
+      "nature": "生食",
       "effects": [
         {"_comment": "饱和 概率 tick 强度", "effect": "saturation", "chance": 0.1, "duration": 2, "amplifier": 0},
         {"_comment": "生命恢复 概率 时间 强度", "effect": "regeneration", "chance": 0.0, "duration": 0, "amplifier": 0},
@@ -31,6 +37,9 @@
     {
       "_comment": "生鸡肉",
       "item": "minecraft:chicken",
+      "classification": "肉类",
+      "features": ["鸡肉"],
+      "nature": "生食",
       "effects": [
         {"_comment": "饱和 概率 tick 强度", "effect": "saturation", "chance": 0.1, "duration": 2, "amplifier": 0},
         {"_comment": "生命恢复 概率 时间 强度", "effect": "regeneration", "chance": 0.0, "duration": 0, "amplifier": 0},
@@ -43,6 +52,9 @@
     {
       "_comment": "生羊肉",
       "item": "minecraft:mutton",
+      "classification": "肉类",
+      "features": ["羊肉"],
+      "nature": "生食",
       "effects": [
         {"_comment": "饱和 概率 tick 强度", "effect": "saturation", "chance": 0.1, "duration": 2, "amplifier": 0},
         {"_comment": "生命恢复 概率 时间 强度", "effect": "regeneration", "chance": 0.0, "duration": 0, "amplifier": 0},
@@ -55,6 +67,9 @@
     {
       "_comment": "生兔肉",
       "item": "minecraft:rabbit",
+      "classification": "肉类",
+      "features": ["兔肉"],
+      "nature": "生食",
       "effects": [
         {"_comment": "饱和 概率 tick 强度", "effect": "saturation", "chance": 0.1, "duration": 2, "amplifier": 0},
         {"_comment": "生命恢复 概率 时间 强度", "effect": "regeneration", "chance": 0.0, "duration": 0, "amplifier": 0},
@@ -67,6 +82,9 @@
     {
       "_comment": "生鳕鱼",
       "item": "minecraft:cod",
+      "classification": "鱼类",
+      "features": ["鳕鱼"],
+      "nature": "生食",
       "effects": [
         {"_comment": "饱和 概率 tick 强度", "effect": "saturation", "chance": 0.1, "duration": 2, "amplifier": 0},
         {"_comment": "生命恢复 概率 时间 强度", "effect": "regeneration", "chance": 0.0, "duration": 0, "amplifier": 0},
@@ -79,6 +97,9 @@
     {
       "_comment": "生鲑鱼",
       "item": "minecraft:salmon",
+      "classification": "鱼类",
+      "features": ["鲑鱼"],
+      "nature": "生食",
       "effects": [
         {"_comment": "饱和 概率 tick 强度", "effect": "saturation", "chance": 0.1, "duration": 2, "amplifier": 0},
         {"_comment": "生命恢复 概率 时间 强度", "effect": "regeneration", "chance": 0.0, "duration": 0, "amplifier": 0},
@@ -91,6 +112,9 @@
     {
       "_comment": "热带鱼",
       "item": "minecraft:tropical_fish",
+      "classification": "鱼类",
+      "features": ["热带鱼"],
+      "nature": "生食",
       "effects": [
         {"_comment": "饱和 概率 tick 强度", "effect": "saturation", "chance": 0.1, "duration": 2, "amplifier": 0},
         {"_comment": "生命恢复 概率 时间 强度", "effect": "regeneration", "chance": 0.0, "duration": 0, "amplifier": 0},
@@ -103,6 +127,9 @@
     {
       "_comment": "河豚",
       "item": "minecraft:pufferfish",
+      "classification": "鱼类",
+      "features": ["河豚", "毒素"],
+      "nature": "生食",
       "effects": [
         {"_comment": "饱和 概率 tick 强度", "effect": "saturation", "chance": 0.1, "duration": 2, "amplifier": 0},
         {"_comment": "生命恢复 概率 时间 强度", "effect": "regeneration", "chance": 0.0, "duration": 0, "amplifier": 0},
@@ -115,6 +142,9 @@
     {
       "_comment": "蜘蛛眼",
       "item": "minecraft:spider_eye",
+      "classification": "肉类",
+      "features": ["怪物肉", "毒素"],
+      "nature": "生食",
       "effects": [
         {"_comment": "饱和 概率 tick 强度", "effect": "saturation", "chance": 0.1, "duration": 2, "amplifier": 0},
         {"_comment": "生命恢复 概率 时间 强度", "effect": "regeneration", "chance": 0.0, "duration": 0, "amplifier": 0},

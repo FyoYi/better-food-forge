@@ -54,9 +54,12 @@ public class ModServerEvents {
                 for (Entity entity : serverLevel.getAllEntities()) {
                     if (entity instanceof ItemEntity itemEntity) {
                         ItemStack stack = itemEntity.getItem();
+                        
                         if (FoodConfig.canRot(stack)) {
                             if (TimeManager.DECAY_ENABLED && FreshnessHelper.isRotten(serverLevel, stack)) {
-                                itemEntity.setItem(new ItemStack(Items.ROTTEN_FLESH, stack.getCount()));
+                                // 根据食物点决定过期后变成什么
+                                ItemStack newItem = getRottenItemByTags(stack);
+                                itemEntity.setItem(new ItemStack(newItem.getItem(), stack.getCount()));
                             } else {
                                 FreshnessHelper.getExpiryTime(serverLevel, stack, true);
                             }
@@ -101,9 +104,12 @@ public class ModServerEvents {
 
     private static void checkAndReplace(net.minecraft.world.level.Level level, Slot slot) {
         ItemStack stack = slot.getItem();
+        
         if (FoodConfig.canRot(stack)) {
             if (TimeManager.DECAY_ENABLED && FreshnessHelper.isRotten(level, stack)) {
-                slot.set(new ItemStack(Items.ROTTEN_FLESH, stack.getCount()));
+                // 根据食物点决定过期后变成什么
+                ItemStack newItem = getRottenItemByTags(stack);
+                slot.set(new ItemStack(newItem.getItem(), stack.getCount()));
             } else {
                 FreshnessHelper.getExpiryTime(level, stack, true);
             }
@@ -113,15 +119,50 @@ public class ModServerEvents {
     private static void checkInventoryForRot(net.minecraft.world.level.Level level, Container container) {
         for (int i = 0; i < container.getContainerSize(); i++) {
             ItemStack stack = container.getItem(i);
+            
             if (FoodConfig.canRot(stack)) {
                 if (TimeManager.DECAY_ENABLED && FreshnessHelper.isRotten(level, stack)) {
-                    container.setItem(i, new ItemStack(Items.ROTTEN_FLESH, stack.getCount()));
+                    // 根据食物点决定过期后变成什么
+                    ItemStack newItem = getRottenItemByTags(stack);
+                    container.setItem(i, new ItemStack(newItem.getItem(), stack.getCount()));
                     container.setChanged();
                 } else {
                     FreshnessHelper.getExpiryTime(level, stack, true);
                 }
             }
         }
+    }
+
+    /**
+     * 根据食物点决定过期后变成什么
+     * @param stack 原始食物
+     * @return 过期后的新物品
+     */
+    private static ItemStack getRottenItemByTags(ItemStack stack) {
+        Set<String> tags = FoodConfig.getFoodTags(stack);
+        
+        // 检查分类属性
+        for (String tag : tags) {
+            if (tag.startsWith("分类:")) {
+                String classification = tag.substring(3); // 去掉"分类:"前缀
+                if ("蔬菜".equals(classification) || "水果".equals(classification) || "谷物".equals(classification)) {
+                    // 蔬菜、水果、谷物类食物变成骨粉
+                    return new ItemStack(Items.BONE_MEAL, stack.getCount());
+                } else if ("肉类".equals(classification) || "鱼类".equals(classification)) {
+                    // 肉类、鱼类食物变成腐肉
+                    return new ItemStack(Items.ROTTEN_FLESH, stack.getCount());
+                } else if ("汤食".equals(classification)) {
+                    // 汤食类食物变成碗
+                    return new ItemStack(Items.BOWL, stack.getCount());
+                } else if ("饮品".equals(classification)) {
+                    // 饮品类食物变成空玻璃瓶
+                    return new ItemStack(Items.GLASS_BOTTLE, stack.getCount());
+                }
+            }
+        }
+        
+        // 默认变成腐肉
+        return new ItemStack(Items.ROTTEN_FLESH, stack.getCount());
     }
 
     // ==========================================================
@@ -197,6 +238,41 @@ public class ModServerEvents {
                     }
                 }
             }
+        }
+    }
+
+    /**
+     * 判断两个食物是否属于相同新鲜度等级
+     * @param level 世界对象
+     * @param stack1 食物1
+     * @param stack2 食物2
+     * @return 是否属于相同新鲜度等级
+     */
+    private static boolean isSameFreshnessGrade(net.minecraft.world.level.Level level, ItemStack stack1, ItemStack stack2) {
+        float percent1 = FreshnessHelper.getFreshnessPercentage(level, stack1);
+        float percent2 = FreshnessHelper.getFreshnessPercentage(level, stack2);
+        
+        // 根据新鲜度百分比判断所属等级
+        // 0.8, 0.5, 0.3, 0.1
+        return getFreshnessGrade(percent1) == getFreshnessGrade(percent2);
+    }
+    
+    /**
+     * 根据新鲜度百分比获取新鲜度等级
+     * @param percent 新鲜度百分比
+     * @return 新鲜度等级 (0-4)
+     */
+    private static int getFreshnessGrade(float percent) {
+        if (percent >= 0.8f) {
+            return 4; // 新鲜
+        } else if (percent >= 0.5f) {
+            return 3; // 不新鲜
+        } else if (percent >= 0.3f) {
+            return 2; // 略微变质
+        } else if (percent >= 0.1f) {
+            return 1; // 变质
+        } else {
+            return 0; // 严重变质
         }
     }
 }

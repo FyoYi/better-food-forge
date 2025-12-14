@@ -1,92 +1,262 @@
 {
-  "_comment": "中期保鲜食物 (4天)",
+  "_comment": "中期保鲜食物 (16天)",
   "_comment2": "支持的效果: saturation(饱和), regeneration(生命恢复), absorption(伤害吸收), fire_resistance(防火), water_breathing(水下呼吸), luck(幸运)",
   "_comment3": "参数说明 - effect:效果类型, chance:概率(0.0-1.0), duration:持续时间(秒,饱和用tick), amplifier:等级(0=I, 1=II, 2=III)",
 
-  "ticks": 288000,
+  "ticks": 384000,
   "items": [
     {
       "_comment": "面包",
       "item": "minecraft:bread",
+      "classification": "谷物",
+      "features": ["甜食"],
+      "nature": "熟食",
       "effects": [
-        {"_comment": "饱和 概率 tick 强度", "effect": "saturation", "chance": 0.1, "duration": 2, "amplifier": 0},
-        {"_comment": "生命恢复 概率 时间 强度", "effect": "regeneration", "chance": 0.0, "duration": 0, "amplifier": 0},
-        {"_comment": "伤害吸收 概率 时间 强度", "effect": "absorption", "chance": 0.0, "duration": 0, "amplifier": 0},
-        {"_comment": "防火 概率 时间 强度", "effect": "fire_resistance", "chance": 0.0, "duration": 0, "amplifier": 0},
-        {"_comment": "水下呼吸 概率 时间 强度", "effect": "water_breathing", "chance": 0.0, "duration": 0, "amplifier": 0},
-        {"_comment": "幸运 概率 时间 强度", "effect": "luck", "chance": 0.0, "duration": 0, "amplifier": 0}
-      ]
-    },
-    {
-      "_comment": "曲奇",
-      "item": "minecraft:cookie",
-      "effects": [
-        {"_comment": "饱和 概率 tick 强度", "effect": "saturation", "chance": 0.1, "duration": 2, "amplifier": 0},
-        {"_comment": "生命恢复 概率 时间 强度", "effect": "regeneration", "chance": 0.0, "duration": 0, "amplifier": 0},
-        {"_comment": "伤害吸收 概率 时间 强度", "effect": "absorption", "chance": 0.0, "duration": 0, "amplifier": 0},
-        {"_comment": "防火 概率 时间 强度", "effect": "fire_resistance", "chance": 0.0, "duration": 0, "amplifier": 0},
-        {"_comment": "水下呼吸 概率 时间 强度", "effect": "water_breathing", "chance": 0.0, "duration": 0, "amplifier": 0},
-        {"_comment": "幸运 概率 时间 强度", "effect": "luck", "chance": 0.0, "duration": 0, "amplifier": 0}
+        {"_comment": "饱和 概率 时间 强度", "effect": "saturation", "chance": 0.1, "duration": 2, "amplifier": 0}
       ]
     },
     {
       "_comment": "胡萝卜",
       "item": "minecraft:carrot",
+      "classification": "蔬菜",
+      "features": ["甜食"],
+      "nature": "生食",
       "effects": [
-        {"_comment": "饱和 概率 tick 强度", "effect": "saturation", "chance": 0.1, "duration": 2, "amplifier": 0},
-        {"_comment": "生命恢复 概率 时间 强度", "effect": "regeneration", "chance": 0.0, "duration": 0, "amplifier": 0},
-        {"_comment": "伤害吸收 概率 时间 强度", "effect": "absorption", "chance": 0.0, "duration": 0, "amplifier": 0},
-        {"_comment": "防火 概率 时间 强度", "effect": "fire_resistance", "chance": 0.0, "duration": 0, "amplifier": 0},
-        {"_comment": "水下呼吸 概率 时间 强度", "effect": "water_breathing", "chance": 0.0, "duration": 0, "amplifier": 0},
-        {"_comment": "幸运 概率 时间 强度", "effect": "luck", "chance": 0.0, "duration": 0, "amplifier": 0}
+        {"_comment": "饱和 概率 时间 强度", "effect": "saturation", "chance": 0.1, "duration": 2, "amplifier": 0}
       ]
     },
     {
-      "_comment": "土豆",
+      "_comment": "马铃薯",
       "item": "minecraft:potato",
+      "classification": "蔬菜",
+      "features": [],
+      "nature": "生食",
       "effects": [
-        {"_comment": "饱和 概率 tick 强度", "effect": "saturation", "chance": 0.1, "duration": 2, "amplifier": 0},
-        {"_comment": "生命恢复 概率 时间 强度", "effect": "regeneration", "chance": 0.0, "duration": 0, "amplifier": 0},
-        {"_comment": "伤害吸收 概率 时间 强度", "effect": "absorption", "chance": 0.0, "duration": 0, "amplifier": 0},
-        {"_comment": "防火 概率 时间 强度", "effect": "fire_resistance", "chance": 0.0, "duration": 0, "amplifier": 0},
-        {"_comment": "水下呼吸 概率 时间 强度", "effect": "water_breathing", "chance": 0.0, "duration": 0, "amplifier": 0},
-        {"_comment": "幸运 概率 时间 强度", "effect": "luck", "chance": 0.0, "duration": 0, "amplifier": 0}
+        {"_comment": "饱和 概率 时间 强度", "effect": "saturation", "chance": 0.1, "duration": 2, "amplifier": 0}
       ]
     },
     {
-      "_comment": "烤土豆",
+      "_comment": "烤马铃薯",
       "item": "minecraft:baked_potato",
+      "classification": "蔬菜",
+      "features": ["甜食"],
+      "nature": "熟食",
       "effects": [
-        {"_comment": "饱和 概率 tick 强度", "effect": "saturation", "chance": 0.6, "duration": 6, "amplifier": 0},
-        {"_comment": "生命恢复 概率 时间 强度", "effect": "regeneration", "chance": 0.0, "duration": 0, "amplifier": 0},
-        {"_comment": "伤害吸收 概率 时间 强度", "effect": "absorption", "chance": 0.0, "duration": 0, "amplifier": 0},
-        {"_comment": "防火 概率 时间 强度", "effect": "fire_resistance", "chance": 0.0, "duration": 0, "amplifier": 0},
-        {"_comment": "水下呼吸 概率 时间 强度", "effect": "water_breathing", "chance": 0.0, "duration": 0, "amplifier": 0},
-        {"_comment": "幸运 概率 时间 强度", "effect": "luck", "chance": 0.0, "duration": 0, "amplifier": 0}
+        {"_comment": "饱和 概率 时间 强度", "effect": "saturation", "chance": 0.1, "duration": 2, "amplifier": 0}
       ]
     },
     {
       "_comment": "甜菜根",
       "item": "minecraft:beetroot",
+      "classification": "蔬菜",
+      "features": [],
+      "nature": "生食",
       "effects": [
-        {"_comment": "饱和 概率 tick 强度", "effect": "saturation", "chance": 0.1, "duration": 2, "amplifier": 0},
-        {"_comment": "生命恢复 概率 时间 强度", "effect": "regeneration", "chance": 0.0, "duration": 0, "amplifier": 0},
-        {"_comment": "伤害吸收 概率 时间 强度", "effect": "absorption", "chance": 0.0, "duration": 0, "amplifier": 0},
-        {"_comment": "防火 概率 时间 强度", "effect": "fire_resistance", "chance": 0.0, "duration": 0, "amplifier": 0},
-        {"_comment": "水下呼吸 概率 时间 强度", "effect": "water_breathing", "chance": 0.0, "duration": 0, "amplifier": 0},
-        {"_comment": "幸运 概率 时间 强度", "effect": "luck", "chance": 0.0, "duration": 0, "amplifier": 0}
+        {"_comment": "饱和 概率 时间 强度", "effect": "saturation", "chance": 0.1, "duration": 2, "amplifier": 0}
       ]
     },
     {
-      "_comment": "干海带",
-      "item": "minecraft:dried_kelp",
+      "_comment": "甜菜汤",
+      "item": "minecraft:beetroot_soup",
+      "classification": "汤食",
+      "features": ["蔬菜"],
+      "nature": "熟食",
       "effects": [
-        {"_comment": "饱和 概率 tick 强度", "effect": "saturation", "chance": 0.1, "duration": 2, "amplifier": 0},
-        {"_comment": "生命恢复 概率 时间 强度", "effect": "regeneration", "chance": 0.0, "duration": 0, "amplifier": 0},
-        {"_comment": "伤害吸收 概率 时间 强度", "effect": "absorption", "chance": 0.0, "duration": 0, "amplifier": 0},
-        {"_comment": "防火 概率 时间 强度", "effect": "fire_resistance", "chance": 0.0, "duration": 0, "amplifier": 0},
-        {"_comment": "水下呼吸 概率 时间 强度", "effect": "water_breathing", "chance": 0.0, "duration": 0, "amplifier": 0},
-        {"_comment": "幸运 概率 时间 强度", "effect": "luck", "chance": 0.0, "duration": 0, "amplifier": 0}
+        {"_comment": "饱和 概率 时间 强度", "effect": "saturation", "chance": 0.1, "duration": 2, "amplifier": 0}
+      ]
+    },
+    {
+      "_comment": "生猪肉",
+      "item": "minecraft:porkchop",
+      "classification": "肉类",
+      "features": ["猪肉"],
+      "nature": "生食",
+      "effects": [
+        {"_comment": "饱和 概率 时间 强度", "effect": "saturation", "chance": 0.1, "duration": 2, "amplifier": 0}
+      ]
+    },
+    {
+      "_comment": "烤猪肉",
+      "item": "minecraft:cooked_porkchop",
+      "classification": "肉类",
+      "features": ["猪肉"],
+      "nature": "熟食",
+      "effects": [
+        {"_comment": "饱和 概率 时间 强度", "effect": "saturation", "chance": 0.1, "duration": 2, "amplifier": 0}
+      ]
+    },
+    {
+      "_comment": "生牛肉",
+      "item": "minecraft:beef",
+      "classification": "肉类",
+      "features": ["牛肉"],
+      "nature": "生食",
+      "effects": [
+        {"_comment": "饱和 概率 时间 强度", "effect": "saturation", "chance": 0.1, "duration": 2, "amplifier": 0}
+      ]
+    },
+    {
+      "_comment": "牛排",
+      "item": "minecraft:cooked_beef",
+      "classification": "肉类",
+      "features": ["牛肉"],
+      "nature": "熟食",
+      "effects": [
+        {"_comment": "饱和 概率 时间 强度", "effect": "saturation", "chance": 0.1, "duration": 2, "amplifier": 0}
+      ]
+    },
+    {
+      "_comment": "生鸡肉",
+      "item": "minecraft:chicken",
+      "classification": "肉类",
+      "features": ["鸡肉"],
+      "nature": "生食",
+      "effects": [
+        {"_comment": "饱和 概率 时间 强度", "effect": "saturation", "chance": 0.1, "duration": 2, "amplifier": 0},
+        {"_comment": "有概率获得食物中毒", "effect": "hunger", "chance": 0.3, "duration": 30, "amplifier": 0}
+      ]
+    },
+    {
+      "_comment": "烤鸡肉",
+      "item": "minecraft:cooked_chicken",
+      "classification": "肉类",
+      "features": ["鸡肉"],
+      "nature": "熟食",
+      "effects": [
+        {"_comment": "饱和 概率 时间 强度", "effect": "saturation", "chance": 0.1, "duration": 2, "amplifier": 0}
+      ]
+    },
+    {
+      "_comment": "生羊肉",
+      "item": "minecraft:mutton",
+      "classification": "肉类",
+      "features": ["羊肉"],
+      "nature": "生食",
+      "effects": [
+        {"_comment": "饱和 概率 时间 强度", "effect": "saturation", "chance": 0.1, "duration": 2, "amplifier": 0}
+      ]
+    },
+    {
+      "_comment": "烤羊肉",
+      "item": "minecraft:cooked_mutton",
+      "classification": "肉类",
+      "features": ["羊肉"],
+      "nature": "熟食",
+      "effects": [
+        {"_comment": "饱和 概率 时间 强度", "effect": "saturation", "chance": 0.1, "duration": 2, "amplifier": 0}
+      ]
+    },
+    {
+      "_comment": "生兔肉",
+      "item": "minecraft:rabbit",
+      "classification": "肉类",
+      "features": ["兔肉"],
+      "nature": "生食",
+      "effects": [
+        {"_comment": "饱和 概率 时间 强度", "effect": "saturation", "chance": 0.1, "duration": 2, "amplifier": 0}
+      ]
+    },
+    {
+      "_comment": "烤兔肉",
+      "item": "minecraft:cooked_rabbit",
+      "classification": "肉类",
+      "features": ["兔肉"],
+      "nature": "熟食",
+      "effects": [
+        {"_comment": "饱和 概率 时间 强度", "effect": "saturation", "chance": 0.1, "duration": 2, "amplifier": 0}
+      ]
+    },
+    {
+      "_comment": "兔肉煲",
+      "item": "minecraft:rabbit_stew",
+      "classification": "汤食",
+      "features": ["肉类", "兔肉"],
+      "nature": "熟食",
+      "effects": [
+        {"_comment": "饱和 概率 时间 强度", "effect": "saturation", "chance": 0.1, "duration": 2, "amplifier": 0}
+      ]
+    },
+    {
+      "_comment": "生鳕鱼",
+      "item": "minecraft:cod",
+      "classification": "鱼类",
+      "features": [],
+      "nature": "生食",
+      "effects": [
+        {"_comment": "饱和 概率 时间 强度", "effect": "saturation", "chance": 0.1, "duration": 2, "amplifier": 0}
+      ]
+    },
+    {
+      "_comment": "烤鳕鱼",
+      "item": "minecraft:cooked_cod",
+      "classification": "鱼类",
+      "features": [],
+      "nature": "熟食",
+      "effects": [
+        {"_comment": "饱和 概率 时间 强度", "effect": "saturation", "chance": 0.1, "duration": 2, "amplifier": 0}
+      ]
+    },
+    {
+      "_comment": "生鲑鱼",
+      "item": "minecraft:salmon",
+      "classification": "鱼类",
+      "features": [],
+      "nature": "生食",
+      "effects": [
+        {"_comment": "饱和 概率 时间 强度", "effect": "saturation", "chance": 0.1, "duration": 2, "amplifier": 0}
+      ]
+    },
+    {
+      "_comment": "烤鲑鱼",
+      "item": "minecraft:cooked_salmon",
+      "classification": "鱼类",
+      "features": [],
+      "nature": "熟食",
+      "effects": [
+        {"_comment": "饱和 概率 时间 强度", "effect": "saturation", "chance": 0.1, "duration": 2, "amplifier": 0}
+      ]
+    },
+    {
+      "_comment": "热带鱼",
+      "item": "minecraft:tropical_fish",
+      "classification": "鱼类",
+      "features": [],
+      "nature": "生食",
+      "effects": [
+        {"_comment": "饱和 概率 时间 强度", "effect": "saturation", "chance": 0.1, "duration": 2, "amplifier": 0}
+      ]
+    },
+    {
+      "_comment": "河豚",
+      "item": "minecraft:pufferfish",
+      "classification": "鱼类",
+      "features": ["毒素"],
+      "nature": "生食",
+      "effects": [
+        {"_comment": "饱和 概率 时间 强度", "effect": "saturation", "chance": 0.1, "duration": 2, "amplifier": 0},
+        {"_comment": "有概率获得中毒", "effect": "poison", "chance": 1.0, "duration": 60, "amplifier": 1},
+        {"_comment": "有概率获得饥饿", "effect": "hunger", "chance": 1.0, "duration": 15, "amplifier": 2},
+        {"_comment": "有概率获得反胃", "effect": "nausea", "chance": 1.0, "duration": 15, "amplifier": 0}
+      ]
+    },
+    {
+      "_comment": "蘑菇煲",
+      "item": "minecraft:mushroom_stew",
+      "classification": "汤食",
+      "features": ["蔬菜"],
+      "nature": "熟食",
+      "effects": [
+        {"_comment": "饱和 概率 时间 强度", "effect": "saturation", "chance": 0.1, "duration": 2, "amplifier": 0}
+      ]
+    },
+    {
+      "_comment": "南瓜派",
+      "item": "minecraft:pumpkin_pie",
+      "classification": "蔬菜",
+      "features": ["甜食"],
+      "nature": "熟食",
+      "effects": [
+        {"_comment": "饱和 概率 时间 强度", "effect": "saturation", "chance": 0.1, "duration": 2, "amplifier": 0}
       ]
     }
   ]

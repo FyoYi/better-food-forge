@@ -21,6 +21,8 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.HashSet;
 
 public class UserConfigManager {
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
@@ -51,11 +53,43 @@ public class UserConfigManager {
             json.add(key, array);
         });
     }
+    
+    // 保存/更新食物点
+    public static void saveTagsOverride(Item item, Set<String> tags) {
+        modifyJson(json -> {
+            String key = ForgeRegistries.ITEMS.getKey(item).toString() + "_tags";
+            JsonArray array = new JsonArray();
+            for (String tag : tags) {
+                array.add(tag);
+            }
+            json.add(key, array);
+        });
+    }
 
     // === 【新增】移除单个条目 ===
     public static void removeOverride(Item item) {
         modifyJson(json -> {
             String key = ForgeRegistries.ITEMS.getKey(item).toString();
+            if (json.has(key)) {
+                json.remove(key);
+            }
+        });
+    }
+
+    // === 【新增】移除单个奖励条目 ===
+    public static void removeBonusOverride(Item item) {
+        modifyJson(json -> {
+            String key = ForgeRegistries.ITEMS.getKey(item).toString() + "_bonuses";
+            if (json.has(key)) {
+                json.remove(key);
+            }
+        });
+    }
+
+    // === 【新增】移除单个标签条目 ===
+    public static void removeTagsOverride(Item item) {
+        modifyJson(json -> {
+            String key = ForgeRegistries.ITEMS.getKey(item).toString() + "_tags";
             if (json.has(key)) {
                 json.remove(key);
             }
@@ -118,26 +152,49 @@ public class UserConfigManager {
                                     float chance = obj.get("chance").getAsFloat();
                                     int duration = obj.get("duration").getAsInt();
                                     int amplifier = obj.get("amplifier").getAsInt();
+                                    
                                     MobEffect effect = parseEffect(effectStr);
                                     if (effect != null) {
                                         bonuses.add(new FoodConfig.EffectBonus(effect, chance, duration, amplifier));
                                     }
                                 }
                             }
-                            FoodConfig.registerBonus(item, bonuses);
+                            if (!bonuses.isEmpty()) {
+                                FoodConfig.registerBonus(item, bonuses);
+                            }
+                        }
+                    }
+                } else if (key.endsWith("_tags")) {
+                    // 处理食物点配置
+                    String itemKey = key.substring(0, key.length() - 5); // 移除 "_tags"
+                    ResourceLocation id = new ResourceLocation(itemKey);
+                    if (ForgeRegistries.ITEMS.containsKey(id)) {
+                        Item item = ForgeRegistries.ITEMS.getValue(id);
+                        if (entry.getValue().isJsonArray()) {
+                            JsonArray array = entry.getValue().getAsJsonArray();
+                            Set<String> tags = new HashSet<>();
+                            for (com.google.gson.JsonElement elem : array) {
+                                tags.add(elem.getAsString());
+                            }
+                            if (!tags.isEmpty()) {
+                                FoodConfig.registerTags(item, tags);
+                            }
                         }
                     }
                 } else {
-                    // 处理时间配置
+                    // 处理保质期配置
                     ResourceLocation id = new ResourceLocation(key);
                     if (ForgeRegistries.ITEMS.containsKey(id)) {
                         Item item = ForgeRegistries.ITEMS.getValue(id);
-                        FoodConfig.register(item, entry.getValue().getAsLong());
+                        if (entry.getValue().isJsonPrimitive() && entry.getValue().getAsJsonPrimitive().isNumber()) {
+                            long ticks = entry.getValue().getAsLong();
+                            FoodConfig.register(item, ticks);
+                        }
                     }
                 }
             }
-        } catch (IOException e) {
-            System.err.println("[BetterFood] 读取失败: " + e.getMessage());
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
@@ -152,14 +209,14 @@ public class UserConfigManager {
     }
 
     private static MobEffect parseEffect(String effectStr) {
-        switch (effectStr.toLowerCase()) {
-            case "saturation": return MobEffects.SATURATION;
-            case "regeneration": return MobEffects.REGENERATION;
-            case "absorption": return MobEffects.ABSORPTION;
-            case "fire_resistance": return MobEffects.FIRE_RESISTANCE;
-            case "water_breathing": return MobEffects.WATER_BREATHING;
-            case "luck": return MobEffects.LUCK;
-            default: return null;
-        }
+        return switch (effectStr.toLowerCase()) {
+            case "saturation" -> MobEffects.SATURATION;
+            case "regeneration" -> MobEffects.REGENERATION;
+            case "absorption" -> MobEffects.ABSORPTION;
+            case "fire_resistance" -> MobEffects.FIRE_RESISTANCE;
+            case "water_breathing" -> MobEffects.WATER_BREATHING;
+            case "luck" -> MobEffects.LUCK;
+            default -> null;
+        };
     }
 }

@@ -3,21 +3,21 @@ package com.fyoyi.betterfood;
 // === 核心工具类引用 ===
 import com.fyoyi.betterfood.util.FreshnessHelper;
 import com.fyoyi.betterfood.util.TimeManager;
-import com.fyoyi.betterfood.util.FoodExpiryManager;
-import com.fyoyi.betterfood.config.FoodConfig;
+import com.fyoyi.betterfood.util.FoodExpiryManager; // JSON 读取器
+import com.fyoyi.betterfood.config.FoodConfig;     // 配置中心
 // ====================
 import net.minecraft.network.chat.Component;
 import net.minecraft.ChatFormatting;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-
+import net.minecraft.resources.ResourceLocation;
 import com.mojang.logging.LogUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.RegisterItemDecorationsEvent;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.AddReloadListenerEvent;
+import net.minecraftforge.event.AddReloadListenerEvent; // 必须导入这个
 import net.minecraftforge.event.server.ServerStartingEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -28,6 +28,11 @@ import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.registries.ForgeRegistries;
 import org.slf4j.Logger;
+
+// 导入Set和HashSet类
+import java.util.Set;
+import java.util.HashSet;
+// ====================
 
 @Mod(better_food.MOD_ID)
 public class better_food
@@ -114,6 +119,8 @@ public class better_food
                     event.getToolTip().add(Component.literal("新鲜度: 永久新鲜").withStyle(ChatFormatting.AQUA));
                     // 显示新鲜食物效果
                     addFreshFoodEffects(event, stack);
+                    // 显示食物点
+                    addFoodTagsInfo(event, stack);
                     return; // 不需要显示倒计时
                 }
 
@@ -148,6 +155,9 @@ public class better_food
 
                 // 5. 显示新鲜度等级和对应效果
                 addFreshnessStatus(event, percent, stack);
+                
+                // 6. 显示食物点
+                addFoodTagsInfo(event, stack);
             }
         }
 
@@ -164,17 +174,17 @@ public class better_food
                 statusColor = ChatFormatting.GREEN;
                 event.getToolTip().add(Component.literal("新鲜度: " + status).withStyle(statusColor));
                 addFreshFoodEffects(event, stack);
-            } else if (percent >= 0.6f) {
+            } else if (percent >= 0.5f) {
                 status = "不新鲜";
                 statusColor = ChatFormatting.YELLOW;
                 event.getToolTip().add(Component.literal("新鲜度: " + status).withStyle(statusColor));
                 event.getToolTip().add(Component.literal("食用效果: 无").withStyle(ChatFormatting.GRAY));
-            } else if (percent >= 0.4f) {
+            } else if (percent >= 0.3f) {
                 status = "略微变质";
                 statusColor = ChatFormatting.GOLD;
                 event.getToolTip().add(Component.literal("新鲜度: " + status).withStyle(statusColor));
                 event.getToolTip().add(Component.literal("食用效果: 30%概率获得饥饿 (10秒)").withStyle(ChatFormatting.GOLD));
-            } else if (percent >= 0.2f) {
+            } else if (percent >= 0.1f) {
                 status = "变质";
                 statusColor = ChatFormatting.RED;
                 event.getToolTip().add(Component.literal("新鲜度: " + status).withStyle(statusColor));
@@ -258,23 +268,64 @@ public class better_food
             };
         }
 
+        /**
+         * 添加食物标签信息
+         */
+        private static void addFoodTagsInfo(net.minecraftforge.event.entity.player.ItemTooltipEvent event, ItemStack stack) {
+            Set<String> tags = FoodConfig.getFoodTags(stack);
+            if (!tags.isEmpty()) {
+                // 分类存储不同类型的属性
+                String classification = null;
+                Set<String> features = new HashSet<>();
+                String nature = null;
+                
+                // 解析标签
+                for (String tag : tags) {
+                    if (tag.startsWith("分类:")) {
+                        classification = tag.substring(3); // 去掉"分类:"前缀
+                    } else if (tag.startsWith("特点:")) {
+                        features.add(tag.substring(3)); // 去掉"特点:"前缀
+                    } else if (tag.startsWith("性质:")) {
+                        nature = tag.substring(3); // 去掉"性质:"前缀
+                    }
+                }
+                
+                // 显示属性
+                event.getToolTip().add(Component.literal("食物属性:").withStyle(ChatFormatting.AQUA));
+                if (classification != null) {
+                    event.getToolTip().add(Component.literal("分类: " + classification).withStyle(ChatFormatting.GRAY));
+                }
+                if (!features.isEmpty()) {
+                    StringBuilder featuresStr = new StringBuilder();
+                    for (String feature : features) {
+                        if (featuresStr.length() > 0) {
+                            featuresStr.append(", ");
+                        }
+                        featuresStr.append(feature);
+                    }
+                    event.getToolTip().add(Component.literal("特点: " + featuresStr.toString()).withStyle(ChatFormatting.GRAY));
+                }
+                if (nature != null) {
+                    event.getToolTip().add(Component.literal("性质: " + nature).withStyle(ChatFormatting.GRAY));
+                }
+            }
+        }
+
         // ========================================================
         // 功能 2：渲染耐久条 (新鲜度条)
         // ========================================================
         public static void registerItemDecorations(RegisterItemDecorationsEvent event) {
-            System.out.println(">>> BetterFood DEBUG: 装饰器正在注册！ <<<");
-
             for (Item item : ForgeRegistries.ITEMS) {
-                // 使用 Config 检查
-                if (FoodConfig.canRot(item.getDefaultInstance())) {
-
+                ItemStack defaultStack = new ItemStack(item);
+                // 检查物品是否可以腐烂（有自定义保质期或可食用）
+                if (FoodConfig.canRot(defaultStack)) {
                     event.register(item, (graphics, font, stack, x, y) -> {
                         if (Minecraft.getInstance().level == null) return false;
 
                         // 使用 Helper 计算百分比 (内部会自动处理 -1 返回 1.0)
                         float percent = FreshnessHelper.getFreshnessPercentage(Minecraft.getInstance().level, stack);
 
-                        // 只有不满的时候显示条 (percent < 1.0)
+                        // 只有不是完全新鲜的时候才显示条 (percent < 1.0)
                         if (percent < 1.0F) {
                             int barWidth = Math.round(13.0F * percent);
                             int color = java.awt.Color.HSBtoRGB(percent / 3.0F, 1.0F, 1.0F);

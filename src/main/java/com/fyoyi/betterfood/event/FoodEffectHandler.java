@@ -69,18 +69,18 @@ public class FoodEffectHandler {
                 }
             }
         }
-        // B. 不新鲜 (60% - 80%)
-        else if (percent >= 0.6f) {
+        // B. 不新鲜 (50% - 80%)
+        else if (percent >= 0.5f) {
             // 无效果
         }
-        // C. 略微变质 (40% - 60%)
-        else if (percent >= 0.4f) {
+        // C. 略微变质 (30% - 50%)
+        else if (percent >= 0.3f) {
             if (RANDOM.nextFloat() < 0.3f) {
                 player.addEffect(new MobEffectInstance(MobEffects.HUNGER, 10 * 20, 0));
             }
         }
-        // D. 变质 (20% - 40%)
-        else if (percent >= 0.2f) {
+        // D. 变质 (10% - 30%)
+        else if (percent >= 0.1f) {
             if (RANDOM.nextFloat() < 0.5f) {
                 player.addEffect(new MobEffectInstance(MobEffects.HUNGER, 15 * 20, 0));
             }
@@ -88,7 +88,7 @@ public class FoodEffectHandler {
                 applyRandomBadEffect(player, 5 * 20);
             }
         }
-        // E. 严重变质 (0% - 20%)
+        // E. 严重变质 (0% - 10%)
         else {
             if (RANDOM.nextFloat() < 0.8f) {
                 player.addEffect(new MobEffectInstance(MobEffects.HUNGER, 20 * 20, 0));
