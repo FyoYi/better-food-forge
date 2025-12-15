@@ -1,42 +1,38 @@
 {
-  "_comment": "长期保鲜食物 (75天)",
+  "_comment": "长期保鲜食物 (1000min)包含黄金食物、蜂蜜",
   "_comment2": "支持的效果: saturation(饱和), regeneration(生命恢复), absorption(伤害吸收), fire_resistance(防火), water_breathing(水下呼吸), luck(幸运)",
   "_comment3": "参数说明 - effect:效果类型, chance:概率(0.0-1.0), duration:持续时间(秒,饱和用tick), amplifier:等级(0=I, 1=II, 2=III)",
 
-  "ticks": 1800000,
+  "ticks": 1200000,
   "items": [
-    {
-      "_comment": "蜘蛛眼",
-      "item": "minecraft:spider_eye",
-      "classification": "肉类",
-      "features": ["怪物肉", "毒素"],
-      "nature": "生食",
-      "effects": [
-        {"_comment": "饱和 概率 时间 强度", "effect": "saturation", "chance": 0.1, "duration": 2, "amplifier": 0},
-        {"_comment": "有概率获得中毒", "effect": "poison", "chance": 1.0, "duration": 5, "amplifier": 0}
-      ]
-    },
     {
       "_comment": "蜂蜜瓶",
       "item": "minecraft:honey_bottle",
       "classification": "饮品",
       "features": ["甜食"],
-      "nature": "熟食",
+      "nature": "生食",
       "effects": [
-        {"_comment": "饱和 概率 时间 强度", "effect": "saturation", "chance": 0.1, "duration": 2, "amplifier": 0}
+        {"_comment": "饱和 概率 tick 强度", "effect": "saturation", "chance": 0.3, "duration": 2, "amplifier": 0},
+        {"_comment": "生命恢复 概率 时间 强度", "effect": "regeneration", "chance": 0.6, "duration": 5, "amplifier": 2},
+        {"_comment": "伤害吸收 概率 时间 强度", "effect": "absorption", "chance": 0.0, "duration": 0, "amplifier": 0},
+        {"_comment": "防火 概率 时间 强度", "effect": "fire_resistance", "chance": 0.0, "duration": 0, "amplifier": 0},
+        {"_comment": "水下呼吸 概率 时间 强度", "effect": "water_breathing", "chance": 0.0, "duration": 0, "amplifier": 0},
+        {"_comment": "幸运 概率 时间 强度", "effect": "luck", "chance": 0.0, "duration": 0, "amplifier": 0}
       ]
     },
     {
       "_comment": "金苹果",
       "item": "minecraft:golden_apple",
       "classification": "水果",
-      "features": ["黄金", "附魔"],
+      "features": ["黄金"],
       "nature": "生食",
       "effects": [
-        {"_comment": "饱和 概率 时间 强度", "effect": "saturation", "chance": 1.0, "duration": 20, "amplifier": 0},
-        {"_comment": "生命恢复", "effect": "regeneration", "chance": 1.0, "duration": 100, "amplifier": 1},
-        {"_comment": "抗火", "effect": "fire_resistance", "chance": 1.0, "duration": 500, "amplifier": 0},
-        {"_comment": "抗性提升", "effect": "resistance", "chance": 1.0, "duration": 300, "amplifier": 0}
+        {"_comment": "饱和 概率 tick 强度", "effect": "saturation", "chance": 0.1, "duration": 2, "amplifier": 0},
+        {"_comment": "生命恢复 概率 时间 强度", "effect": "regeneration", "chance": 0.0, "duration": 0, "amplifier": 0},
+        {"_comment": "伤害吸收 概率 时间 强度", "effect": "absorption", "chance": 0.0, "duration": 0, "amplifier": 0},
+        {"_comment": "防火 概率 时间 强度", "effect": "fire_resistance", "chance": 0.0, "duration": 0, "amplifier": 0},
+        {"_comment": "水下呼吸 概率 时间 强度", "effect": "water_breathing", "chance": 0.0, "duration": 0, "amplifier": 0},
+        {"_comment": "幸运 概率 时间 强度", "effect": "luck", "chance": 0.01, "duration": 500, "amplifier": 2}
       ]
     },
     {
@@ -44,10 +40,29 @@
       "item": "minecraft:golden_carrot",
       "classification": "蔬菜",
       "features": ["黄金"],
-      "nature": "熟食",
+      "nature": "生食",
       "effects": [
-        {"_comment": "饱和 概率 时间 强度", "effect": "saturation", "chance": 1.0, "duration": 2, "amplifier": 0},
-        {"_comment": "生命恢复", "effect": "regeneration", "chance": 0.5, "duration": 3, "amplifier": 2}
+        {"_comment": "饱和 概率 tick 强度", "effect": "saturation", "chance": 0.1, "duration": 2, "amplifier": 0},
+        {"_comment": "生命恢复 概率 时间 强度", "effect": "regeneration", "chance": 0.0, "duration": 0, "amplifier": 0},
+        {"_comment": "伤害吸收 概率 时间 强度", "effect": "absorption", "chance": 0.0, "duration": 0, "amplifier": 0},
+        {"_comment": "防火 概率 时间 强度", "effect": "fire_resistance", "chance": 0.0, "duration": 0, "amplifier": 0},
+        {"_comment": "水下呼吸 概率 时间 强度", "effect": "water_breathing", "chance": 0.0, "duration": 0, "amplifier": 0},
+        {"_comment": "幸运 概率 时间 强度", "effect": "luck", "chance": 0.01, "duration": 500, "amplifier": 2}
+      ]
+    },
+    {
+      "_comment": "紫颂果",
+      "item": "minecraft:chorus_fruit",
+      "classification": "水果",
+      "features": ["附魔"],
+      "nature": "生食",
+      "effects": [
+        {"_comment": "饱和 概率 tick 强度", "effect": "saturation", "chance": 0.1, "duration": 2, "amplifier": 0},
+        {"_comment": "生命恢复 概率 时间 强度", "effect": "regeneration", "chance": 0.0, "duration": 0, "amplifier": 0},
+        {"_comment": "伤害吸收 概率 时间 强度", "effect": "absorption", "chance": 0.0, "duration": 0, "amplifier": 0},
+        {"_comment": "防火 概率 时间 强度", "effect": "fire_resistance", "chance": 0.0, "duration": 0, "amplifier": 0},
+        {"_comment": "水下呼吸 概率 时间 强度", "effect": "water_breathing", "chance": 0.0, "duration": 0, "amplifier": 0},
+        {"_comment": "幸运 概率 时间 强度", "effect": "luck", "chance": 0.0, "duration": 0, "amplifier": 0}
       ]
     }
   ]

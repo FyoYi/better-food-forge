@@ -104,6 +104,8 @@ public class better_food
                 event.getToolTip().add(Component.literal("食用效果:").withStyle(ChatFormatting.DARK_RED));
                 event.getToolTip().add(Component.literal(" - 100%概率获得饥饿 (25秒)").withStyle(ChatFormatting.DARK_RED));
                 event.getToolTip().add(Component.literal(" - 80%概率获得中毒/反胃 (5秒)").withStyle(ChatFormatting.DARK_RED));
+                // 显示食物属性
+                addFoodTagsInfo(event, stack);
                 return;
             }
 

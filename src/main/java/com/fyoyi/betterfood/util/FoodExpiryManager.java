@@ -54,7 +54,10 @@ public class FoodExpiryManager extends SimpleJsonResourceReloadListener {
             }
         }
 
-        // 3. 【核心新增】最后加载用户的本地覆盖配置 (优先级最高)
+        // 3. 注册默认食物属性
+        registerDefaultFoodAttributes();
+        
+        // 4. 【核心新增】最后加载用户的本地覆盖配置 (优先级最高)
         UserConfigManager.loadOverrides();
 
         System.out.println("[BetterFood] 所有保质期配置加载完毕。注册的食物数量: " + FoodConfig.getRegisteredFoodCount());
@@ -186,6 +189,20 @@ public class FoodExpiryManager extends SimpleJsonResourceReloadListener {
         return item;
     }
 
+    /**
+     * 注册默认食物属性
+     */
+    private void registerDefaultFoodAttributes() {
+        // 为腐肉注册默认属性：分类：肉类 特点：怪物肉 性质：生食
+        Item rottenFlesh = net.minecraft.world.item.Items.ROTTEN_FLESH;
+        Set<String> tags = new HashSet<>();
+        tags.add("分类:肉类");
+        tags.add("特点:怪物肉");
+        tags.add("性质:生食");
+        FoodConfig.registerTags(rottenFlesh, tags);
+        System.out.println("[BetterFood] 已为腐肉注册默认属性: 分类:肉类, 特点:怪物肉, 性质:生食");
+    }
+    
     private MobEffect parseEffect(String effectStr) {
         ResourceLocation rl = ResourceLocation.tryParse(effectStr);
         if (rl == null) {
