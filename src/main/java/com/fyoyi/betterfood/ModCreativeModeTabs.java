@@ -26,11 +26,11 @@ public class ModCreativeModeTabs {
      */
     public static final RegistryObject<CreativeModeTab> BETTER_FOOD_TAB = CREATIVE_MODE_TABS.register("better_food_tab",
             () -> CreativeModeTab.builder()
-                    .icon(() -> new ItemStack(ModItems.EXAMPLE_BLOCK.get()))
+                    .icon(() -> new ItemStack(ModItems.COOKING_PAN.get()))
                     .title(Component.translatable("creativemodetab.better_food_tab"))
                     .displayItems((parameters, output) -> {
                         // 添加物品到创造模式物品栏
-                        output.accept(ModItems.EXAMPLE_BLOCK.get());
+                        output.accept(ModItems.COOKING_PAN.get());
                     })
                     .build());
 

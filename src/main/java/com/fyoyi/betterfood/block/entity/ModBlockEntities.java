@@ -16,7 +16,7 @@ public class ModBlockEntities {
     public static final RegistryObject<BlockEntityType<PotBlockEntity>> POT_BE =
             BLOCK_ENTITIES.register("pot_be", () ->
                     BlockEntityType.Builder.of(PotBlockEntity::new,
-                            ModBlocks.EXAMPLE_BLOCK.get()).build(null));
+                            ModBlocks.COOKING_PAN.get()).build(null));
 
     public static void register(IEventBus eventBus) {
         BLOCK_ENTITIES.register(eventBus);

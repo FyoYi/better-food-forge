@@ -1,12 +1,11 @@
 package com.fyoyi.betterfood.block;
 
 import com.fyoyi.betterfood.block.entity.PotBlockEntity;
-import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.Containers; // 【新增】用于掉落物品
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
@@ -16,7 +15,6 @@ import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.BaseEntityBlock;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.EntityBlock;
 import net.minecraft.world.level.block.RenderShape;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
@@ -47,53 +45,53 @@ public class SimpleFoodBlock extends BaseEntityBlock {
         return RenderShape.MODEL;
     }
 
-    // === 【核心修改】支持放入4个物品 ===
     @Override
     public InteractionResult use(BlockState pState, Level pLevel, BlockPos pPos, Player pPlayer, InteractionHand pHand, BlockHitResult pHit) {
         if (pHand != InteractionHand.MAIN_HAND) return InteractionResult.PASS;
 
-        // 1. 蹲下拿锅逻辑 (不变)
+        // === 1. 蹲下拿锅逻辑 ===
         if (pPlayer.isShiftKeyDown() && pPlayer.getItemInHand(pHand).isEmpty()) {
             if (!pLevel.isClientSide) {
+                ItemStack potItem = new ItemStack(this);
+
+                BlockEntity be = pLevel.getBlockEntity(pPos);
+                if (be instanceof PotBlockEntity pot) {
+                    // 1. 保存数据到物品
+                    pot.saveToItem(potItem);
+
+                    // 2. 【核心修复】清空方块里的物品
+                    // 为什么？因为下面调用 removeBlock 会触发 onRemove 方法
+                    // 如果不清空，onRemove 会以为方块被破坏了，又把食物掉落一次，导致物品翻倍！
+                    pot.getItems().clear();
+                }
+
+                // 3. 销毁方块 (会触发 onRemove)
                 pLevel.removeBlock(pPos, false);
-                popResource(pLevel, pPos, new ItemStack(this));
+
+                // 4. 给玩家锅
+                pPlayer.setItemInHand(pHand, potItem);
+                pLevel.playSound(null, pPos, SoundEvents.LANTERN_BREAK, SoundSource.BLOCKS, 1.0F, 1.0F);
             }
             return InteractionResult.SUCCESS;
         }
 
+        // === 2. 正常放入/取出逻辑 ===
         if (!pLevel.isClientSide) {
             BlockEntity be = pLevel.getBlockEntity(pPos);
             if (be instanceof PotBlockEntity pot) {
                 ItemStack handItem = pPlayer.getItemInHand(pHand);
 
-                // 情况A：手里有东西 -> 尝试放入 (Push)
                 if (!handItem.isEmpty()) {
-
-                    // ======================================================
-                    // 【核心修改】判断是否是食物
-                    // ======================================================
-                    // isEdible() 会检查物品是否拥有 FoodProperties (食物属性)
-                    // 这样苹果、面包、猪排能放进去，但石头、剑就放不进去了
                     if (handItem.getItem().isEdible()) {
-
                         boolean success = pot.pushItem(handItem);
-
                         if (success) {
                             pLevel.playSound(null, pPos, SoundEvents.ITEM_FRAME_ADD_ITEM, SoundSource.BLOCKS, 1.0F, 1.0F);
                             if (!pPlayer.isCreative()) {
                                 handItem.shrink(1);
                             }
-                        } else {
-                            // 满了，提示一下玩家（可选）
-                             pPlayer.displayClientMessage(Component.literal("锅满了！").withStyle(ChatFormatting.GOLD), true);
                         }
-                    } else {
-                        // 如果不是食物，什么都不做，或者给个提示
-                         pPlayer.displayClientMessage(Component.literal("这不能吃！").withStyle(ChatFormatting.GOLD), true);
                     }
-                }
-                // 情况B：手里没东西 -> 尝试取出 (Pop) (保持不变)
-                else {
+                } else {
                     ItemStack takenItem = pot.popItem();
                     if (!takenItem.isEmpty()) {
                         boolean added = pPlayer.getInventory().add(takenItem);
@@ -107,6 +105,24 @@ public class SimpleFoodBlock extends BaseEntityBlock {
         }
 
         return InteractionResult.SUCCESS;
+    }
+
+    // =========================================================
+    // 【新增】方块被破坏时的逻辑 (onRemove)
+    // =========================================================
+    @Override
+    public void onRemove(BlockState pState, Level pLevel, BlockPos pPos, BlockState pNewState, boolean pIsMoving) {
+        // 如果方块真的被移除了（而不是仅仅修改了状态属性）
+        if (pState.getBlock() != pNewState.getBlock()) {
+            BlockEntity blockEntity = pLevel.getBlockEntity(pPos);
+            if (blockEntity instanceof PotBlockEntity) {
+                // 使用 Minecraft 原生方法，把容器里的所有东西都喷出来
+                Containers.dropContents(pLevel, pPos, ((PotBlockEntity) blockEntity).getItems());
+                // 注意：这里不需要手动 updateNeighbourShapes，super.onRemove 会处理
+            }
+        }
+        // 必须调用父类方法，否则 BlockEntity 不会被正确移除
+        super.onRemove(pState, pLevel, pPos, pNewState, pIsMoving);
     }
 
     @Override

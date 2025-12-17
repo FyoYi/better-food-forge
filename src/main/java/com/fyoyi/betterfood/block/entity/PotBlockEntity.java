@@ -13,25 +13,20 @@ import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.Nullable;
 
 public class PotBlockEntity extends BlockEntity {
-    // 【修改点】容量为 4 的列表，不再是单个物品
+    // 列表必须初始化，否则崩溃
     private final NonNullList<ItemStack> items = NonNullList.withSize(4, ItemStack.EMPTY);
 
     public PotBlockEntity(BlockPos pPos, BlockState pBlockState) {
         super(ModBlockEntities.POT_BE.get(), pPos, pBlockState);
     }
 
-    // 获取所有物品的列表 (给渲染器用)
     public NonNullList<ItemStack> getItems() {
         return items;
     }
 
-    // === 逻辑：尝试放入物品 (Push) ===
-    // 返回 true 表示放入成功
     public boolean pushItem(ItemStack stack) {
         for (int i = 0; i < items.size(); i++) {
             if (items.get(i).isEmpty()) {
-                // 找到第一个空位，放进去
-                // copy() 很重要，防止引用问题
                 ItemStack toAdd = stack.copy();
                 toAdd.setCount(1);
                 items.set(i, toAdd);
@@ -39,25 +34,21 @@ public class PotBlockEntity extends BlockEntity {
                 return true;
             }
         }
-        return false; // 满了
+        return false;
     }
 
-    // === 逻辑：尝试取出最上面的物品 (Pop) ===
-    // 返回取出的物品，如果空则返回 ItemStack.EMPTY
     public ItemStack popItem() {
-        // 从后往前遍历 (堆栈逻辑：后进先出)
         for (int i = items.size() - 1; i >= 0; i--) {
             if (!items.get(i).isEmpty()) {
                 ItemStack stack = items.get(i).copy();
-                items.set(i, ItemStack.EMPTY); // 清空该格子
+                items.set(i, ItemStack.EMPTY);
                 markUpdated();
                 return stack;
             }
         }
-        return ItemStack.EMPTY; // 空的
+        return ItemStack.EMPTY;
     }
 
-    // 统一的数据更新方法
     private void markUpdated() {
         setChanged();
         if (level != null) {
@@ -65,35 +56,42 @@ public class PotBlockEntity extends BlockEntity {
         }
     }
 
-    // === NBT 保存 (使用 ContainerHelper 简化列表保存) ===
+    // === 【关键】NBT 保存与读取 ===
+    // 统一使用 ContainerHelper，它会自动处理 "Items" 这个 key，不要自己加 "inventory" 前缀了
+
     @Override
     protected void saveAdditional(CompoundTag pTag) {
         super.saveAdditional(pTag);
         ContainerHelper.saveAllItems(pTag, items);
     }
 
-    // === NBT 读取 ===
     @Override
     public void load(CompoundTag pTag) {
         super.load(pTag);
-        items.clear(); // 先清空，防止叠加
+        items.clear();
         ContainerHelper.loadAllItems(pTag, items);
     }
 
-    // === 网络同步 ===
-    @Override
-    public CompoundTag getUpdateTag() {
-        return saveWithoutMetadata();
+    // 把当前数据存进一个物品里
+    public void saveToItem(ItemStack stack) {
+        CompoundTag nbt = new CompoundTag();
+        ContainerHelper.saveAllItems(nbt, items); // 存入 nbt
+
+        // 只有里面真有东西才存 tag，保持物品整洁
+        boolean hasItem = false;
+        for(ItemStack s : items) if(!s.isEmpty()) hasItem = true;
+
+        if (hasItem) {
+            stack.addTagElement("BlockEntityTag", nbt);
+        }
     }
 
+    // 网络同步
+    @Override
+    public CompoundTag getUpdateTag() { return saveWithoutMetadata(); }
     @Nullable
     @Override
-    public Packet<ClientGamePacketListener> getUpdatePacket() {
-        return ClientboundBlockEntityDataPacket.create(this);
-    }
-
+    public Packet<ClientGamePacketListener> getUpdatePacket() { return ClientboundBlockEntityDataPacket.create(this); }
     @Override
-    public void onDataPacket(net.minecraft.network.Connection net, ClientboundBlockEntityDataPacket pkt) {
-        this.load(pkt.getTag());
-    }
+    public void onDataPacket(net.minecraft.network.Connection net, ClientboundBlockEntityDataPacket pkt) { this.load(pkt.getTag()); }
 }
