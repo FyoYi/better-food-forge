@@ -1,3 +1,7 @@
+/*
+ * Better Food 模组主类
+ * 该类是整个模组的入口点，负责初始化模组的各种组件和服务
+ */
 package com.fyoyi.betterfood;
 
 // === 核心工具类引用 ===
@@ -5,7 +9,16 @@ import com.fyoyi.betterfood.util.FreshnessHelper;
 import com.fyoyi.betterfood.util.TimeManager;
 import com.fyoyi.betterfood.util.FoodExpiryManager; // JSON 读取器
 import com.fyoyi.betterfood.config.FoodConfig;     // 配置中心
+import com.fyoyi.betterfood.block.ModBlocks;
+import com.fyoyi.betterfood.item.ModItems;
+import com.fyoyi.betterfood.ModCreativeModeTabs;
 // ====================
+import com.fyoyi.betterfood.block.entity.ModBlockEntities;
+// === 【新增】导入渲染器相关类 ===
+import com.fyoyi.betterfood.client.renderer.PotBlockRenderer;
+import net.minecraftforge.client.event.EntityRenderersEvent;
+// =============================
+
 import net.minecraft.network.chat.Component;
 import net.minecraft.ChatFormatting;
 import net.minecraft.world.item.Item;
@@ -17,7 +30,7 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.RegisterItemDecorationsEvent;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.AddReloadListenerEvent; // 必须导入这个
+import net.minecraftforge.event.AddReloadListenerEvent;
 import net.minecraftforge.event.server.ServerStartingEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -29,17 +42,25 @@ import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.registries.ForgeRegistries;
 import org.slf4j.Logger;
 
-// 导入Set和HashSet类
 import java.util.Set;
 import java.util.HashSet;
-// ====================
 
 @Mod(better_food.MOD_ID)
 public class better_food
 {
+    /*
+     * 模组ID常量
+     */
     public static final String MOD_ID = "better_food";
+
+    /*
+     * 日志记录器实例
+     */
     private static final Logger LOGGER = LogUtils.getLogger();
 
+    /*
+     * 模组构造函数
+     */
     public better_food(FMLJavaModLoadingContext context)
     {
         IEventBus modEventBus = context.getModEventBus();
@@ -49,11 +70,27 @@ public class better_food
         // 注册服务端事件总线
         MinecraftForge.EVENT_BUS.register(this);
 
-        // >>> 【核心】注册资源重载监听器 (用于读取 JSON 配置) <<<
+        // 注册方块
+        ModBlocks.register(modEventBus);
+
+        // 注册物品
+        ModItems.register(modEventBus);
+
+        // 注册方块实体 (BlockEntity)
+        ModBlockEntities.register(modEventBus);
+
+        // 注册创造模式物品栏
+        ModCreativeModeTabs.register(modEventBus);
+
+        // 注册资源重载监听器
         MinecraftForge.EVENT_BUS.addListener(this::addReloadListener);
 
         // 手动注册物品栏装饰器 (画耐久条)
         modEventBus.addListener(ClientModEvents::registerItemDecorations);
+
+        // >>> 【核心修复】手动注册实体渲染器 <<<
+        // 必须在这里注册，才能在模组加载时正确绑定渲染器
+        modEventBus.addListener(ClientModEvents::registerRenderers);
 
         context.registerConfig(ModConfig.Type.COMMON, Config.SPEC);
     }
@@ -67,9 +104,7 @@ public class better_food
         Config.items.forEach((item) -> LOGGER.info("ITEM >> {}", item.toString()));
     }
 
-    // === 【新增】事件回调：添加 JSON 读取器 ===
     public void addReloadListener(AddReloadListenerEvent event) {
-        // 注册 FoodExpiryManager，它现在会同时处理保质期和新鲜奖励
         event.addListener(new FoodExpiryManager());
     }
 
@@ -92,6 +127,14 @@ public class better_food
         }
 
         // ========================================================
+        // 【新增】注册方块实体渲染器 (让锅里能显示物品)
+        // ========================================================
+        public static void registerRenderers(EntityRenderersEvent.RegisterRenderers event) {
+            // 将我们的 PotBlockEntity 和 PotBlockRenderer 绑定
+            event.registerBlockEntityRenderer(ModBlockEntities.POT_BE.get(), PotBlockRenderer::new);
+        }
+
+        // ========================================================
         // 功能 1：Tooltip (显示保质期文字)
         // ========================================================
         @SubscribeEvent
@@ -104,47 +147,37 @@ public class better_food
                 event.getToolTip().add(Component.literal("食用效果:").withStyle(ChatFormatting.DARK_RED));
                 event.getToolTip().add(Component.literal(" - 100%概率获得饥饿 (25秒)").withStyle(ChatFormatting.DARK_RED));
                 event.getToolTip().add(Component.literal(" - 80%概率获得中毒/反胃 (5秒)").withStyle(ChatFormatting.DARK_RED));
-                // 显示食物属性
                 addFoodTagsInfo(event, stack);
                 return;
             }
 
-            // 只要腐烂开启，且是可腐烂食物 (FoodConfig 判断)，就显示
             if (TimeManager.DECAY_ENABLED && FoodConfig.canRot(stack)) {
-
-                // 1. 获取总寿命 (从 JSON 配置或默认值获取)
                 long lifetime = FoodConfig.getItemLifetime(stack);
 
-                // === 如果是无限保质期 (-1)，显示特殊文字并直接返回 ===
                 if (lifetime == FoodConfig.SHELF_LIFE_INFINITE) {
                     event.getToolTip().add(Component.literal("保质期: 永久保鲜").withStyle(ChatFormatting.GOLD));
                     event.getToolTip().add(Component.literal("新鲜度: 永久新鲜").withStyle(ChatFormatting.AQUA));
-                    // 显示新鲜食物效果
                     addFreshFoodEffects(event, stack);
-                    // 显示食物点
                     addFoodTagsInfo(event, stack);
-                    return; // 不需要显示倒计时
+                    return;
                 }
 
                 net.minecraft.world.level.Level level = event.getEntity() != null ? event.getEntity().level() : null;
                 if (level == null) return;
 
-                // 2. 正常显示保质期
                 String lifeStr = FreshnessHelper.formatDuration(lifetime);
                 event.getToolTip().add(Component.literal("保质期: " + lifeStr).withStyle(ChatFormatting.BLUE));
 
-                // 3. 计算剩余时间
                 long expiry = FreshnessHelper.getExpiryTime(level, stack, false);
                 long remaining;
 
                 if (expiry == Long.MAX_VALUE) {
-                    remaining = lifetime; // 全新
+                    remaining = lifetime;
                 } else {
                     long now = TimeManager.getEffectiveTime(level);
                     remaining = Math.max(0, expiry - now);
                 }
 
-                // 4. 显示倒计时
                 String remainStr = FreshnessHelper.formatDuration(remaining);
                 ChatFormatting color;
                 float percent = (float) remaining / lifetime;
@@ -154,23 +187,15 @@ public class better_food
                 else color = ChatFormatting.RED;
 
                 event.getToolTip().add(Component.literal("距离腐烂: " + remainStr).withStyle(color));
-
-                // 5. 显示新鲜度等级和对应效果
                 addFreshnessStatus(event, percent, stack);
-                
-                // 6. 显示食物点
                 addFoodTagsInfo(event, stack);
             }
         }
 
-        /**
-         * 添加新鲜度状态和食用效果提示
-         */
         private static void addFreshnessStatus(net.minecraftforge.event.entity.player.ItemTooltipEvent event, float percent, ItemStack stack) {
             String status;
             ChatFormatting statusColor;
-            
-            // 新鲜度等级判定
+
             if (percent >= 0.8f) {
                 status = "新鲜";
                 statusColor = ChatFormatting.GREEN;
@@ -203,36 +228,31 @@ public class better_food
             }
         }
 
-        /**
-         * 添加新鲜食物的奖励效果提示
-         */
         private static void addFreshFoodEffects(net.minecraftforge.event.entity.player.ItemTooltipEvent event, ItemStack stack) {
             java.util.List<FoodConfig.EffectBonus> bonuses = FoodConfig.getBonusEffects(stack);
             if (bonuses != null && !bonuses.isEmpty()) {
-                // 过滤掉概率为 0 的效果
                 java.util.List<FoodConfig.EffectBonus> validBonuses = new java.util.ArrayList<>();
                 for (FoodConfig.EffectBonus bonus : bonuses) {
                     if (bonus.chance > 0.0f) {
                         validBonuses.add(bonus);
                     }
                 }
-                
+
                 if (!validBonuses.isEmpty()) {
                     event.getToolTip().add(Component.literal("食用效果:").withStyle(ChatFormatting.LIGHT_PURPLE));
                     for (FoodConfig.EffectBonus bonus : validBonuses) {
                         int chancePercent = (int)(bonus.chance * 100);
                         String effectName = getEffectName(bonus.effect);
                         String amplifierStr = bonus.amplifier > 0 ? (" " + toRoman(bonus.amplifier + 1)) : "";
-                        
-                        // 饱和效果特殊显示：显示饥饿度恢复量（2tick = 1饥饿度）
+
                         String durationStr;
                         if (bonus.effect == net.minecraft.world.effect.MobEffects.SATURATION) {
-                            int hunger = bonus.durationSeconds / 2; // 2tick = 1饥饿度
-                            durationStr = "+" + hunger + "饥饿度"; // 显示恢复的饥饿度
+                            int hunger = bonus.durationSeconds / 2;
+                            durationStr = "+" + hunger + "饥饿度";
                         } else {
                             durationStr = bonus.durationSeconds + "秒";
                         }
-                        
+
                         event.getToolTip().add(Component.literal(" - " + chancePercent + "%概率获得" + effectName + amplifierStr + " (" + durationStr + ")").withStyle(ChatFormatting.LIGHT_PURPLE));
                     }
                 } else {
@@ -243,9 +263,6 @@ public class better_food
             }
         }
 
-        /**
-         * 获取效果名称 (中文) - 只支持6种食物奖励效果
-         */
         private static String getEffectName(net.minecraft.world.effect.MobEffect effect) {
             if (effect == net.minecraft.world.effect.MobEffects.SATURATION) return "饱和";
             if (effect == net.minecraft.world.effect.MobEffects.REGENERATION) return "生命恢复";
@@ -256,9 +273,6 @@ public class better_food
             return effect.getDescriptionId();
         }
 
-        /**
-         * 将数字转为罗马数字 (1=I, 2=II, 3=III, ...)
-         */
         private static String toRoman(int number) {
             return switch (number) {
                 case 1 -> "I";
@@ -270,29 +284,23 @@ public class better_food
             };
         }
 
-        /**
-         * 添加食物标签信息
-         */
         private static void addFoodTagsInfo(net.minecraftforge.event.entity.player.ItemTooltipEvent event, ItemStack stack) {
             Set<String> tags = FoodConfig.getFoodTags(stack);
             if (!tags.isEmpty()) {
-                // 分类存储不同类型的属性
                 String classification = null;
                 Set<String> features = new HashSet<>();
                 String nature = null;
-                
-                // 解析标签
+
                 for (String tag : tags) {
                     if (tag.startsWith("分类:")) {
-                        classification = tag.substring(3); // 去掉"分类:"前缀
+                        classification = tag.substring(3);
                     } else if (tag.startsWith("特点:")) {
-                        features.add(tag.substring(3)); // 去掉"特点:"前缀
+                        features.add(tag.substring(3));
                     } else if (tag.startsWith("性质:")) {
-                        nature = tag.substring(3); // 去掉"性质:"前缀
+                        nature = tag.substring(3);
                     }
                 }
-                
-                // 显示属性
+
                 event.getToolTip().add(Component.literal("食物属性:").withStyle(ChatFormatting.AQUA));
                 if (classification != null) {
                     event.getToolTip().add(Component.literal("分类: " + classification).withStyle(ChatFormatting.GRAY));
@@ -319,15 +327,12 @@ public class better_food
         public static void registerItemDecorations(RegisterItemDecorationsEvent event) {
             for (Item item : ForgeRegistries.ITEMS) {
                 ItemStack defaultStack = new ItemStack(item);
-                // 检查物品是否可以腐烂（有自定义保质期或可食用）
                 if (FoodConfig.canRot(defaultStack)) {
                     event.register(item, (graphics, font, stack, x, y) -> {
                         if (Minecraft.getInstance().level == null) return false;
 
-                        // 使用 Helper 计算百分比 (内部会自动处理 -1 返回 1.0)
                         float percent = FreshnessHelper.getFreshnessPercentage(Minecraft.getInstance().level, stack);
 
-                        // 只有不是完全新鲜的时候才显示条 (percent < 1.0)
                         if (percent < 1.0F) {
                             int barWidth = Math.round(13.0F * percent);
                             int color = java.awt.Color.HSBtoRGB(percent / 3.0F, 1.0F, 1.0F);
@@ -335,9 +340,7 @@ public class better_food
                             graphics.pose().pushPose();
                             graphics.pose().translate(0, 0, 200);
 
-                            // 黑底
                             graphics.fill(x + 2, y + 13, x + 15, y + 15, 0xFF000000);
-                            // 彩条
                             graphics.fill(x + 2, y + 13, x + 2 + barWidth, y + 14, color | 0xFF000000);
 
                             graphics.pose().popPose();
