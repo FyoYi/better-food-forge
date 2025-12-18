@@ -95,7 +95,7 @@ public class PotBlockItem extends BlockItem implements Equipable {
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> tooltip, TooltipFlag flag) {
+    public void appendHoverText(ItemStack stack, Level level, List<Component> tooltip, TooltipFlag flag) {
         super.appendHoverText(stack, level, tooltip, flag);
 
         CompoundTag tag = stack.getTagElement("BlockEntityTag");
@@ -104,17 +104,31 @@ public class PotBlockItem extends BlockItem implements Equipable {
             ContainerHelper.loadAllItems(tag, items);
 
             int count = 0;
+
+            // 统计有效物品数量
             for (ItemStack item : items) {
-                if (!item.isEmpty()) {
-                    count++;
-                    tooltip.add(Component.literal("- ").append(item.getHoverName()).withStyle(ChatFormatting.GRAY));
-                }
+                if (!item.isEmpty()) count++;
             }
 
             if (count > 0) {
-                tooltip.add(Component.literal("包含 " + count + " 个食材").withStyle(ChatFormatting.GOLD));
-                tooltip.add(Component.literal("(装满食物时不可装备)").withStyle(ChatFormatting.RED));
+                // === 【核心修改】倒序遍历 ===
+                // 这样列表里的显示顺序就是：
+                // - 顶层食物 (Index 3)
+                // - 中层食物 (Index 2)
+                // - 底层食物 (Index 0) [最下面]
+                for (int i = items.size() - 1; i >= 0; i--) {
+                    ItemStack item = items.get(i);
+                    if (!item.isEmpty()) {
+                        tooltip.add(Component.literal("- ").append(item.getHoverName()).withStyle(ChatFormatting.GRAY));
+                    }
+                }
+
+                tooltip.add(Component.literal("包含 " + count + " 个食材").withStyle(ChatFormatting.GREEN));
+            } else {
+                tooltip.add(Component.literal("空").withStyle(ChatFormatting.GRAY));
             }
+        } else {
+            tooltip.add(Component.literal("空").withStyle(ChatFormatting.GRAY));
         }
     }
 
