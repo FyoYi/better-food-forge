@@ -2,7 +2,7 @@ package com.fyoyi.betterfood.client.renderer.large_pot;
 
 import com.fyoyi.betterfood.block.ModBlocks;
 import com.fyoyi.betterfood.block.entity.PotBlockEntity;
-import com.fyoyi.betterfood.client.renderer.PotBlockRenderer;
+import com.fyoyi.betterfood.client.renderer.large_pot.LargePotBlockRenderer;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer;
@@ -16,14 +16,14 @@ import net.minecraft.world.level.block.state.BlockState;
 public class LargePotItemRenderer extends BlockEntityWithoutLevelRenderer {
 
     private final PotBlockEntity dummyEntity;
-    private final PotBlockRenderer renderer;
+    private final LargePotBlockRenderer renderer;
 
     public LargePotItemRenderer() {
         super(Minecraft.getInstance().getBlockEntityRenderDispatcher(), Minecraft.getInstance().getEntityModels());
         BlockState defaultState = ModBlocks.LARGE_POT.get().defaultBlockState();
         this.dummyEntity = new PotBlockEntity(BlockPos.ZERO, defaultState);
         // 手动创建渲染器，参数给 null 即可
-        this.renderer = new PotBlockRenderer(null);
+        this.renderer = new LargePotBlockRenderer(null);
     }
 
     @Override
@@ -43,10 +43,14 @@ public class LargePotItemRenderer extends BlockEntityWithoutLevelRenderer {
         }
 
         // 3. 画锅 (调用方块渲染器画外壳)
-        // 检查是否有盖子
-        BlockState state = ModBlocks.LARGE_POT.get().defaultBlockState();
+        // 检查是否有盖子和水
+        BlockState state = ModBlocks.LARGE_POT.get().defaultBlockState()
+                .setValue(com.fyoyi.betterfood.block.large_pot.LargePotBlock.FACING, net.minecraft.core.Direction.NORTH);
         if (tag != null && tag.contains("has_lid") && tag.getBoolean("has_lid")) {
             state = state.setValue(com.fyoyi.betterfood.block.large_pot.LargePotBlock.HAS_LID, true);
+        }
+        if (tag != null && tag.contains("has_water") && tag.getBoolean("has_water")) {
+            state = state.setValue(com.fyoyi.betterfood.block.large_pot.LargePotBlock.HAS_WATER, true);
         }
         Minecraft.getInstance().getBlockRenderer().renderSingleBlock(
                 state,

@@ -12,6 +12,7 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
@@ -24,6 +25,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.block.state.properties.DirectionProperty;
+import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
@@ -43,11 +45,13 @@ public class LargePotBlock extends BaseEntityBlock {
     public static final DirectionProperty FACING = net.minecraft.world.level.block.HorizontalDirectionalBlock.FACING;
     // 【新增】是否有盖子
     public static final BooleanProperty HAS_LID = BooleanProperty.create("has_lid");
+    // 【新增】是否有水
+    public static final BooleanProperty HAS_WATER = BooleanProperty.create("has_water");
 
     public LargePotBlock(Properties properties) {
         super(properties);
-        // 默认无盖
-        this.registerDefaultState(this.stateDefinition.any().setValue(FACING, Direction.NORTH).setValue(HAS_LID, false));
+        // 默认无盖无水
+        this.registerDefaultState(this.stateDefinition.any().setValue(FACING, Direction.NORTH).setValue(HAS_LID, false).setValue(HAS_WATER, false));
     }
 
     // 【重要】确保模型渲染
@@ -69,6 +73,7 @@ public class LargePotBlock extends BaseEntityBlock {
 
         ItemStack handItem = pPlayer.getItemInHand(pHand);
         boolean hasLid = pState.getValue(HAS_LID);
+        boolean hasWater = pState.getValue(HAS_WATER);
 
         // 1. 【安装锅盖】手里拿锅盖 + 锅没盖子
         if (handItem.getItem() == ModItems.LID.get() && !hasLid) {
@@ -84,6 +89,54 @@ public class LargePotBlock extends BaseEntityBlock {
             return InteractionResult.SUCCESS;
         }
 
+        // 1.5. 【添加水】手里拿水桶 + 锅没水
+        if (handItem.getItem() == Items.WATER_BUCKET && !hasWater) {
+            if (!pLevel.isClientSide) {
+                // 设置为有水状态
+                pLevel.setBlock(pPos, pState.setValue(HAS_WATER, true), 3);
+                // 给玩家空桶
+                if (!pPlayer.isCreative()) {
+                    ItemStack emptyBucket = new ItemStack(Items.BUCKET);
+                    if (handItem.getCount() == 1) {
+                        // 如果手上只有一个水桶，直接替换
+                        pPlayer.setItemInHand(pHand, emptyBucket);
+                    } else {
+                        // 如果手上有多个水桶，减少一个并尝试添加空桶到背包
+                        handItem.shrink(1);
+                        if (!pPlayer.getInventory().add(emptyBucket)) {
+                            pPlayer.drop(emptyBucket, false);
+                        }
+                    }
+                }
+                pLevel.playSound(null, pPos, SoundEvents.BUCKET_EMPTY, SoundSource.BLOCKS, 1.0F, 1.0F);
+            }
+            return InteractionResult.SUCCESS;
+        }
+
+        // 3.5. 【倒出水】锅有水 + 手里是空桶
+        if (hasWater && handItem.getItem() == Items.BUCKET) {
+            if (!pLevel.isClientSide) {
+                // 设置为无水状态
+                pLevel.setBlock(pPos, pState.setValue(HAS_WATER, false), 3);
+                // 给玩家水桶
+                if (!pPlayer.isCreative()) {
+                    ItemStack waterBucket = new ItemStack(Items.WATER_BUCKET);
+                    if (handItem.getCount() == 1) {
+                        // 如果手上只有一个空桶，直接替换
+                        pPlayer.setItemInHand(pHand, waterBucket);
+                    } else {
+                        // 如果手上有多个空桶，减少一个并尝试添加到背包
+                        handItem.shrink(1);
+                        if (!pPlayer.getInventory().add(waterBucket)) {
+                            pPlayer.drop(waterBucket, false);
+                        }
+                    }
+                }
+                pLevel.playSound(null, pPos, SoundEvents.BUCKET_FILL, SoundSource.BLOCKS, 1.0F, 1.0F);
+            }
+            return InteractionResult.SUCCESS;
+        }
+
         // 2. 【端起锅】蹲下右键 + 锅有盖子 -> 端起整个锅（包括锅盖）
         if (pPlayer.isShiftKeyDown() && hasLid && handItem.isEmpty()) {
             if (!pLevel.isClientSide) {
@@ -94,12 +147,13 @@ public class LargePotBlock extends BaseEntityBlock {
                     // 保存数据到物品，包括标记有盖子
                     pot.saveToItem(potItem); // 使用公共方法保存数据
                     
-                    // 获取现有的BlockEntityTag并添加has_lid属性
+                    // 获取现有的BlockEntityTag并添加has_lid和has_water属性
                     CompoundTag blockEntityTag = potItem.getTagElement("BlockEntityTag");
                     if (blockEntityTag == null) {
                         blockEntityTag = new CompoundTag();
                     }
                     blockEntityTag.putBoolean("has_lid", true); // 标记有盖子
+                    blockEntityTag.putBoolean("has_water", pState.getValue(HAS_WATER)); // 标记是否有水
                     potItem.addTagElement("BlockEntityTag", blockEntityTag);
 
                     // 清空方块里的物品
@@ -143,6 +197,14 @@ public class LargePotBlock extends BaseEntityBlock {
                 if (be instanceof PotBlockEntity pot) {
                     // 1. 保存数据到物品
                     pot.saveToItem(potItem);
+                    
+                    // 2. 保存水的状态
+                    CompoundTag blockEntityTag = potItem.getTagElement("BlockEntityTag");
+                    if (blockEntityTag == null) {
+                        blockEntityTag = new CompoundTag();
+                    }
+                    blockEntityTag.putBoolean("has_water", pState.getValue(HAS_WATER)); // 标记是否有水
+                    potItem.addTagElement("BlockEntityTag", blockEntityTag);
 
                     pot.getItems().clear();
                 }
@@ -202,22 +264,29 @@ public class LargePotBlock extends BaseEntityBlock {
 
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
-        builder.add(FACING, HAS_LID);
+        builder.add(FACING, HAS_LID, HAS_WATER);
     }
 
     @Override
     public BlockState getStateForPlacement(BlockPlaceContext context) {
-        // 从物品中读取是否有盖子的状态
+        // 从物品中读取是否有盖子和水的状态
         ItemStack stack = context.getItemInHand();
         CompoundTag tag = stack.getTagElement("BlockEntityTag");
         boolean hasLid = false;
-        if (tag != null && tag.contains("has_lid")) {
-            hasLid = tag.getBoolean("has_lid");
+        boolean hasWater = false;
+        if (tag != null) {
+            if (tag.contains("has_lid")) {
+                hasLid = tag.getBoolean("has_lid");
+            }
+            if (tag.contains("has_water")) {
+                hasWater = tag.getBoolean("has_water");
+            }
         }
         
         return this.defaultBlockState()
                 .setValue(FACING, context.getHorizontalDirection().getOpposite())
-                .setValue(HAS_LID, hasLid);
+                .setValue(HAS_LID, hasLid)
+                .setValue(HAS_WATER, hasWater);
     }
 
     @Override

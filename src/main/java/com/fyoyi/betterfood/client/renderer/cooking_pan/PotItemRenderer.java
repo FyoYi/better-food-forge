@@ -2,7 +2,7 @@ package com.fyoyi.betterfood.client.renderer.cooking_pan;
 
 import com.fyoyi.betterfood.block.ModBlocks;
 import com.fyoyi.betterfood.block.entity.PotBlockEntity;
-import com.fyoyi.betterfood.client.renderer.PotBlockRenderer;
+import com.fyoyi.betterfood.client.renderer.cooking_pan.CookingPanBlockRenderer;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer;
@@ -16,14 +16,14 @@ import net.minecraft.world.level.block.state.BlockState;
 public class PotItemRenderer extends BlockEntityWithoutLevelRenderer {
 
     private final PotBlockEntity dummyEntity;
-    private final PotBlockRenderer renderer;
+    private final CookingPanBlockRenderer renderer;
 
     public PotItemRenderer() {
         super(Minecraft.getInstance().getBlockEntityRenderDispatcher(), Minecraft.getInstance().getEntityModels());
         BlockState defaultState = ModBlocks.COOKING_PAN.get().defaultBlockState();
         this.dummyEntity = new PotBlockEntity(BlockPos.ZERO, defaultState);
         // 手动创建渲染器，参数给 null 即可
-        this.renderer = new PotBlockRenderer(null);
+        this.renderer = new CookingPanBlockRenderer(null);
     }
 
     @Override

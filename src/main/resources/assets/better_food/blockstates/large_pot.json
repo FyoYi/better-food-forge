@@ -1,60 +1,20 @@
 {
-  "multipart": [
-    {
-      "when": { "has_lid": "false", "facing": "north" },
-      "apply": { 
-        "model": "better_food:block/large_pot",
-        "y": 0
-      }
-    },
-    {
-      "when": { "has_lid": "false", "facing": "east" },
-      "apply": { 
-        "model": "better_food:block/large_pot",
-        "y": 90
-      }
-    },
-    {
-      "when": { "has_lid": "false", "facing": "south" },
-      "apply": { 
-        "model": "better_food:block/large_pot",
-        "y": 180
-      }
-    },
-    {
-      "when": { "has_lid": "false", "facing": "west" },
-      "apply": { 
-        "model": "better_food:block/large_pot",
-        "y": 270
-      }
-    },
-    {
-      "when": { "has_lid": "true", "facing": "north" },
-      "apply": { 
-        "model": "better_food:block/large_pot_lid",
-        "y": 0
-      }
-    },
-    {
-      "when": { "has_lid": "true", "facing": "east" },
-      "apply": { 
-        "model": "better_food:block/large_pot_lid",
-        "y": 90
-      }
-    },
-    {
-      "when": { "has_lid": "true", "facing": "south" },
-      "apply": { 
-        "model": "better_food:block/large_pot_lid",
-        "y": 180
-      }
-    },
-    {
-      "when": { "has_lid": "true", "facing": "west" },
-      "apply": { 
-        "model": "better_food:block/large_pot_lid",
-        "y": 270
-      }
-    }
-  ]
+  "variants": {
+    "has_lid=false,has_water=false,facing=north": { "model": "better_food:block/large_pot" },
+    "has_lid=false,has_water=false,facing=east": { "model": "better_food:block/large_pot", "y": 90 },
+    "has_lid=false,has_water=false,facing=south": { "model": "better_food:block/large_pot", "y": 180 },
+    "has_lid=false,has_water=false,facing=west": { "model": "better_food:block/large_pot", "y": 270 },
+    "has_lid=false,has_water=true,facing=north": { "model": "better_food:block/large_pot_water" },
+    "has_lid=false,has_water=true,facing=east": { "model": "better_food:block/large_pot_water", "y": 90 },
+    "has_lid=false,has_water=true,facing=south": { "model": "better_food:block/large_pot_water", "y": 180 },
+    "has_lid=false,has_water=true,facing=west": { "model": "better_food:block/large_pot_water", "y": 270 },
+    "has_lid=true,has_water=false,facing=north": { "model": "better_food:block/large_pot_lid" },
+    "has_lid=true,has_water=false,facing=east": { "model": "better_food:block/large_pot_lid", "y": 90 },
+    "has_lid=true,has_water=false,facing=south": { "model": "better_food:block/large_pot_lid", "y": 180 },
+    "has_lid=true,has_water=false,facing=west": { "model": "better_food:block/large_pot_lid", "y": 270 },
+    "has_lid=true,has_water=true,facing=north": { "model": "better_food:block/large_pot_lid_water" },
+    "has_lid=true,has_water=true,facing=east": { "model": "better_food:block/large_pot_lid_water", "y": 90 },
+    "has_lid=true,has_water=true,facing=south": { "model": "better_food:block/large_pot_lid_water", "y": 180 },
+    "has_lid=true,has_water=true,facing=west": { "model": "better_food:block/large_pot_lid_water", "y": 270 }
+  }
 }

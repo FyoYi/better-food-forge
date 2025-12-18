@@ -1,4 +1,4 @@
-package com.fyoyi.betterfood.client.renderer;
+package com.fyoyi.betterfood.client.renderer.cooking_pan;
 
 import com.fyoyi.betterfood.block.entity.PotBlockEntity;
 import com.mojang.blaze3d.vertex.PoseStack;
@@ -13,8 +13,8 @@ import net.minecraft.core.NonNullList;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 
-public class PotBlockRenderer implements BlockEntityRenderer<PotBlockEntity> {
-    public PotBlockRenderer(BlockEntityRendererProvider.Context context) {
+public class CookingPanBlockRenderer implements BlockEntityRenderer<PotBlockEntity> {
+    public CookingPanBlockRenderer(BlockEntityRendererProvider.Context context) {
     }
 
     @Override
@@ -33,11 +33,6 @@ public class PotBlockRenderer implements BlockEntityRenderer<PotBlockEntity> {
 
             pPoseStack.pushPose();
 
-            // ==========================================================
-            // 【这里是你发挥的地方 - 自定义每个物品的位置】
-            // i 代表第几个物品 (0是底部第一个，1是第二个...)
-            // ==========================================================
-
             // 基础位置：居中
             float x = 0.5f;
             float z = 0.5f;
@@ -53,13 +48,11 @@ public class PotBlockRenderer implements BlockEntityRenderer<PotBlockEntity> {
             pPoseStack.scale(0.5f, 0.5f, 0.5f);
 
             // 旋转：平躺
-            pPoseStack.mulPose(Axis.XP.rotationDegrees(90f));
+            pPoseStack.mulPose(Axis.XP.rotationDegrees(270f));
 
             // 可选：为了让它们看起来不那么死板，可以让每一层旋转一个不同的角度
             // 比如：第一层转0度，第二层转25度，第三层转50度...
             pPoseStack.mulPose(Axis.ZP.rotationDegrees(i * 45.0f));
-
-            // ==========================================================
 
             // 渲染当前这个物品
             itemRenderer.renderStatic(stack, ItemDisplayContext.FIXED, pPackedLight, OverlayTexture.NO_OVERLAY, pPoseStack, pBufferSource, pBlockEntity.getLevel(), 0);

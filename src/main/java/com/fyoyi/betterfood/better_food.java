@@ -15,7 +15,7 @@ import com.fyoyi.betterfood.ModCreativeModeTabs;
 // ====================
 import com.fyoyi.betterfood.block.entity.ModBlockEntities;
 // === 【新增】导入渲染器相关类 ===
-import com.fyoyi.betterfood.client.renderer.PotBlockRenderer;
+import com.fyoyi.betterfood.client.renderer.PotRendererDispatcher;
 import net.minecraftforge.client.event.EntityRenderersEvent;
 // =============================
 
@@ -130,8 +130,8 @@ public class better_food
         // 【新增】注册方块实体渲染器 (让锅里能显示物品)
         // ========================================================
         public static void registerRenderers(EntityRenderersEvent.RegisterRenderers event) {
-            // 将我们的 PotBlockEntity 和 PotBlockRenderer 绑定
-            event.registerBlockEntityRenderer(ModBlockEntities.POT_BE.get(), PotBlockRenderer::new);
+            // 使用调度器为不同类型的锅具选择合适的渲染器
+            event.registerBlockEntityRenderer(ModBlockEntities.POT_BE.get(), PotRendererDispatcher::new);
         }
 
         // ========================================================

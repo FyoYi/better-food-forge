@@ -6,7 +6,17 @@
       "entries": [
         {
           "type": "minecraft:item",
-          "name": "better_food:large_pot"
+          "name": "better_food:large_pot",
+          "functions": [
+            {
+              "function": "minecraft:copy_state",
+              "block": "better_food:large_pot",
+              "properties": [
+                "has_lid",
+                "has_water"
+              ]
+            }
+          ]
         }
       ],
       "conditions": [

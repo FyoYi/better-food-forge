@@ -17,6 +17,7 @@ public class LidItemRenderer extends BlockEntityWithoutLevelRenderer {
     @Override
     public void renderByItem(ItemStack stack, ItemDisplayContext displayContext, PoseStack poseStack, MultiBufferSource buffer, int packedLight, int packedOverlay) {
         // 渲染锅盖方块模型
+
         Minecraft.getInstance().getBlockRenderer().renderSingleBlock(
                 ModBlocks.LID.get().defaultBlockState(),
                 poseStack,
