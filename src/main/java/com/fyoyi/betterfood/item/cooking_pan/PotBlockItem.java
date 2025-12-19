@@ -1,135 +1,28 @@
 package com.fyoyi.betterfood.item.cooking_pan;
 
+import com.fyoyi.betterfood.block.entity.PotBlockEntity;
 import com.fyoyi.betterfood.client.renderer.cooking_pan.PotItemRenderer;
-import com.google.common.collect.ImmutableMultimap;
-import com.google.common.collect.Multimap;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer;
-import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.sounds.SoundEvent;
-import net.minecraft.sounds.SoundEvents;
+import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.world.ContainerHelper;
-import net.minecraft.world.entity.EquipmentSlot;
-import net.minecraft.world.entity.ai.attributes.Attribute;
-import net.minecraft.world.entity.ai.attributes.AttributeModifier;
-import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.item.BlockItem;
-import net.minecraft.world.item.Equipable;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.core.NonNullList;
 import net.minecraftforge.client.extensions.common.IClientItemExtensions;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
-import java.util.UUID;
 import java.util.function.Consumer;
 
-public class PotBlockItem extends BlockItem implements Equipable {
-
-    protected static final UUID BASE_ATTACK_DAMAGE_UUID = UUID.fromString("CB3F55D3-645C-4F38-A497-9C13A33DB5CF");
-    protected static final UUID BASE_ATTACK_SPEED_UUID = UUID.fromString("FA233E1C-4180-4865-B01B-BCCE9785ACA3");
-    protected static final UUID ARMOR_MODIFIER_UUID = UUID.fromString("632897F2-39C1-47A6-808B-740700392EF5");
-
-    private final Multimap<Attribute, AttributeModifier> defaultModifiers;
-
-    public PotBlockItem(Block block, Properties properties) {
-        super(block, properties);
-        ImmutableMultimap.Builder<Attribute, AttributeModifier> builder = ImmutableMultimap.builder();
-        builder.put(Attributes.ATTACK_DAMAGE, new AttributeModifier(BASE_ATTACK_DAMAGE_UUID, "Weapon modifier", 3.0D, AttributeModifier.Operation.ADDITION));
-        builder.put(Attributes.ATTACK_SPEED, new AttributeModifier(BASE_ATTACK_SPEED_UUID, "Weapon modifier", -2.4D, AttributeModifier.Operation.ADDITION));
-        this.defaultModifiers = builder.build();
-    }
-
-    // === 【修复点1】必须实现这个无参方法，否则报错 ===
-    // 这是 Equipable 接口要求的默认槽位
-    @Override
-    public EquipmentSlot getEquipmentSlot() {
-        return EquipmentSlot.HEAD;
-    }
-
-    // === 【修复点2】Forge 的扩展方法，用于动态判断 ===
-    // 游戏实际逻辑会优先调用这个方法
-    @Override
-    public EquipmentSlot getEquipmentSlot(ItemStack stack) {
-        // 1. 检查是否有数据
-        CompoundTag tag = stack.getTagElement("BlockEntityTag");
-        if (tag != null) {
-            NonNullList<ItemStack> items = NonNullList.withSize(4, ItemStack.EMPTY);
-            ContainerHelper.loadAllItems(tag, items);
-
-            // 2. 如果有任何物品，强制只能拿在手上 (MAINHAND)
-            // 这样右键时就无法装备到头上
-            for (ItemStack s : items) {
-                if (!s.isEmpty()) {
-                    return EquipmentSlot.MAINHAND;
-                }
-            }
-        }
-
-        // 3. 如果是空的，允许戴在头上
-        return EquipmentSlot.HEAD;
-    }
-
-    @Override
-    public SoundEvent getEquipSound() {
-        return SoundEvents.ARMOR_EQUIP_IRON;
-    }
-
-    @Override
-    public Multimap<Attribute, AttributeModifier> getDefaultAttributeModifiers(EquipmentSlot slot) {
-        if (slot == EquipmentSlot.MAINHAND) {
-            return this.defaultModifiers;
-        }
-
-        if (slot == EquipmentSlot.HEAD) {
-            ImmutableMultimap.Builder<Attribute, AttributeModifier> builder = ImmutableMultimap.builder();
-            builder.put(Attributes.ARMOR, new AttributeModifier(ARMOR_MODIFIER_UUID, "Armor modifier", 3.0D, AttributeModifier.Operation.ADDITION));
-            return builder.build();
-        }
-
-        return super.getDefaultAttributeModifiers(slot);
-    }
-
-    @Override
-    public void appendHoverText(ItemStack stack, Level level, List<Component> tooltip, TooltipFlag flag) {
-        super.appendHoverText(stack, level, tooltip, flag);
-
-        CompoundTag tag = stack.getTagElement("BlockEntityTag");
-        if (tag != null) {
-            NonNullList<ItemStack> items = NonNullList.withSize(4, ItemStack.EMPTY);
-            ContainerHelper.loadAllItems(tag, items);
-
-            int count = 0;
-
-            // 统计有效物品数量
-            for (ItemStack item : items) {
-                if (!item.isEmpty()) count++;
-            }
-
-            if (count > 0) {
-                // === 【核心修改】倒序遍历 ===
-                // 这样列表里的显示顺序就是：
-                // - 顶层食物 (Index 3)
-                // - 中层食物 (Index 2)
-                // - 底层食物 (Index 0) [最下面]
-                for (int i = items.size() - 1; i >= 0; i--) {
-                    ItemStack item = items.get(i);
-                    if (!item.isEmpty()) {
-                        tooltip.add(Component.literal("- ").append(item.getHoverName()).withStyle(ChatFormatting.GRAY));
-                    }
-                }
-
-                tooltip.add(Component.literal("包含 " + count + " 个食材").withStyle(ChatFormatting.GREEN));
-            } else {
-                tooltip.add(Component.literal("空").withStyle(ChatFormatting.GRAY));
-            }
-        } else {
-            tooltip.add(Component.literal("空").withStyle(ChatFormatting.GRAY));
-        }
+public class PotBlockItem extends BlockItem {
+    public PotBlockItem(Block pBlock, Properties pProperties) {
+        super(pBlock, pProperties);
     }
 
     @Override
@@ -140,5 +33,50 @@ public class PotBlockItem extends BlockItem implements Equipable {
                 return new PotItemRenderer();
             }
         });
+    }
+
+    @Override
+    public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> tooltip, TooltipFlag flag) {
+        // 1. 调用父类，保证你的 better_food.java 里的事件能正常给锅本身加标签
+        super.appendHoverText(stack, level, tooltip, flag);
+
+        CompoundTag tag = stack.getTagElement("BlockEntityTag");
+        if (tag != null) {
+            NonNullList<ItemStack> items = NonNullList.withSize(4, ItemStack.EMPTY);
+            ContainerHelper.loadAllItems(tag, items);
+
+            boolean hasItem = false;
+            for(ItemStack s : items) if(!s.isEmpty()) hasItem = true;
+
+            if (hasItem) {
+                tooltip.add(Component.empty());
+                tooltip.add(Component.literal("=== 锅内食材 ===").withStyle(ChatFormatting.GOLD));
+
+                // 2. 倒序遍历 (3->0)，顶层在上，底层在下
+                for (int i = 3; i >= 0; i--) {
+                    ItemStack foodStack = items.get(i);
+                    if (!foodStack.isEmpty()) {
+                        float cooked = 0.0f;
+                        if (foodStack.hasTag() && foodStack.getTag().contains(PotBlockEntity.NBT_COOKED_PROGRESS)) {
+                            cooked = foodStack.getTag().getFloat(PotBlockEntity.NBT_COOKED_PROGRESS);
+                        }
+
+                        // 3. 颜色逻辑：100%分界
+                        ChatFormatting color = cooked >= 100.0f ? ChatFormatting.RED : ChatFormatting.GREEN;
+
+                        // 层级名
+                        String layerName = (i == 0) ? "[底层]" : (i == 3 ? "[顶层]" : "[层" + (i + 1) + "]");
+
+                        MutableComponent line = Component.literal(layerName + " ").withStyle(ChatFormatting.GRAY);
+                        // 食物名
+                        line.append(foodStack.getHoverName().copy().withStyle(color));
+                        // 熟度
+                        line.append(Component.literal(String.format(" %.0f%%", cooked)).withStyle(color));
+
+                        tooltip.add(line);
+                    }
+                }
+            }
+        }
     }
 }

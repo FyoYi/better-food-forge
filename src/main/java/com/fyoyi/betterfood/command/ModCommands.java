@@ -836,7 +836,7 @@ public class ModCommands {
                 currentClassification = tag.substring(3);
             } else if (tag.startsWith("特点:")) {
                 currentFeatures.add(tag.substring(3));
-            } else if (tag.startsWith("性质:")) {
+            } else if (tag.startsWith("熟度:")) {
                 currentNature = tag.substring(3);
             }
         }
@@ -847,7 +847,7 @@ public class ModCommands {
         }
         if (currentNature != null) {
             if (featuresStr.length() > 0) featuresStr.append(", ");
-            featuresStr.append("性质:").append(currentNature);
+            featuresStr.append("熟度:").append(currentNature);
         }
         for (String feature : currentFeatures) {
             if (featuresStr.length() > 0) featuresStr.append(", ");
@@ -883,7 +883,7 @@ public class ModCommands {
         MutableComponent attrBtn = Component.literal("[食物特性设置]");
         attrBtn.withStyle(s -> s.withColor(ChatFormatting.AQUA)
                 .withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/betterfood attr_menu"))
-                .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.literal("设置食物分类、特点、性质"))));
+                .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.literal("设置食物分类、特点、熟度"))));
         buttons.append(attrBtn);
         
         source.sendSuccess(() -> buttons, false);
@@ -1045,7 +1045,7 @@ public class ModCommands {
                 currentClassification = tag.substring(3);
             } else if (tag.startsWith("特点:")) {
                 currentFeatures.add(tag.substring(3));
-            } else if (tag.startsWith("性质:")) {
+            } else if (tag.startsWith("熟度:")) {
                 currentNature = tag.substring(3);
             }
         }
@@ -1088,9 +1088,9 @@ public class ModCommands {
         
         if (currentNature != null) {
             final String finalNature = currentNature;
-            source.sendSuccess(() -> Component.literal(" §7当前性质: §f" + finalNature), false);
+            source.sendSuccess(() -> Component.literal(" §7当前熟度: §f" + finalNature), false);
         } else {
-            source.sendSuccess(() -> Component.literal(" §7当前性质: §c未设置"), false);
+            source.sendSuccess(() -> Component.literal(" §7当前熟度: §c未设置"), false);
         }
         
         source.sendSuccess(() -> Component.empty(), false);
@@ -1127,11 +1127,11 @@ public class ModCommands {
         
         source.sendSuccess(() -> Component.empty(), false);
 
-        // --- 性质设置 ---
-        source.sendSuccess(() -> Component.literal(" §7设置性质:"), false);
+        // --- 熟度设置 ---
+        source.sendSuccess(() -> Component.literal(" §7设置熟度:"), false);
         MutableComponent natures = Component.literal(" ");
-        natures.append(makeNatureBtn("生食", registryName, "生食", currentNature, ChatFormatting.RED));
-        natures.append(makeNatureBtn("熟食", registryName, "熟食", currentNature, ChatFormatting.GREEN));
+        natures.append(makeNatureBtn("0%", registryName, "0%", currentNature, ChatFormatting.RED));
+        natures.append(makeNatureBtn("70%", registryName, "70%", currentNature, ChatFormatting.GREEN));
         source.sendSuccess(() -> natures, false);
         
         source.sendSuccess(() -> Component.empty(), false);
@@ -1150,7 +1150,7 @@ public class ModCommands {
         MutableComponent customNatureBtn = Component.literal("[自定义性质]");
         customNatureBtn.withStyle(s -> s.withColor(ChatFormatting.LIGHT_PURPLE)
                 .withClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/betterfood set_nature "))
-                .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.literal("点击后输入性质名称"))));
+                .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.literal("点击后输入熟度名称"))));
         actions.append(customNatureBtn).append(Component.literal("  "));
         
         // 自定义特点按钮
@@ -1354,7 +1354,7 @@ public class ModCommands {
                 currentClassification = tag.substring(3);
             } else if (tag.startsWith("特点:")) {
                 currentFeatures.add(tag.substring(3));
-            } else if (tag.startsWith("性质:")) {
+            } else if (tag.startsWith("熟度:")) {
                 currentNature = tag.substring(3);
             }
         }
@@ -1379,7 +1379,7 @@ public class ModCommands {
             }
             if (currentNature != null) {
                 final String finalNature = currentNature;
-                source.sendSuccess(() -> Component.literal("  §7性质: §f" + finalNature).withStyle(ChatFormatting.GRAY), false);
+                source.sendSuccess(() -> Component.literal("  §7熟度: §f" + finalNature).withStyle(ChatFormatting.GRAY), false);
             }
         } else {
             source.sendSuccess(() -> Component.literal(" §7当前属性: §c未设置").withStyle(ChatFormatting.GRAY), false);
@@ -1570,6 +1570,17 @@ public class ModCommands {
         pauseLine.append(makeBtn(" [暂停]", "/betterfood pause true", ChatFormatting.GOLD));
         source.sendSuccess(() -> pauseLine, false);
 
+        source.sendSuccess(() -> Component.empty(), false);
+        
+        // 添加自定义熟度设置按钮
+        MutableComponent customNatureLine = Component.literal(" §7熟度设置: ");
+        MutableComponent customNatureBtn = Component.literal("[自定义熟度]");
+        customNatureBtn.withStyle(s -> s.withColor(ChatFormatting.LIGHT_PURPLE)
+                .withClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/betterfood set_nature "))
+                .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.literal("点击后输入自定义熟度数值(如: 50%)"))));
+        customNatureLine.append(customNatureBtn);
+        source.sendSuccess(() -> customNatureLine, false);
+
         source.sendSuccess(() -> Component.literal("§m---------------------------------------------").withStyle(ChatFormatting.GRAY), false);
 
         return 1;
@@ -1647,13 +1658,13 @@ public class ModCommands {
             btn = Component.literal("[" + label + "✓]");
             btn.withStyle(s -> s.withColor(ChatFormatting.WHITE).withBold(true)
                     .withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/betterfood set_nature \"" + nature + "\""))
-                    .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.literal("点击取消设置性质: " + nature))));
+                    .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.literal("点击取消设置熟度: " + nature))));
         } else {
             // 未选中的性质，显示为暗色
             btn = Component.literal("[" + label + "]");
             btn.withStyle(s -> s.withColor(ChatFormatting.DARK_GRAY)
                     .withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/betterfood set_nature \"" + nature + "\""))
-                    .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.literal("点击设置性质: " + nature))));
+                    .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.literal("点击设置熟度: " + nature))));
         }
         return btn.append(" "); // 加个空格间隔
     }
@@ -1771,11 +1782,11 @@ public class ModCommands {
         // 获取当前标签
         Set<String> currentTags = new HashSet<>(FoodConfig.getFoodTags(stack));
         
-        // 移除现有的性质标签
-        currentTags.removeIf(tag -> tag.startsWith("性质:"));
+        // 移除现有的熟度标签
+        currentTags.removeIf(tag -> tag.startsWith("熟度:"));
         
-        // 添加新的性质标签
-        String natureTag = "性质:" + nature;
+        // 添加新的熟度标签
+        String natureTag = "熟度:" + nature;
         currentTags.add(natureTag);
         
         // 保存到用户配置
@@ -1784,7 +1795,7 @@ public class ModCommands {
         // 注册到 FoodConfig
         FoodConfig.registerTags(item, currentTags);
         
-        source.sendSuccess(() -> Component.literal("§a[属性] §f已设置性质: " + nature), true);
+        source.sendSuccess(() -> Component.literal("§a[属性] §f已设置熟度: " + nature), true);
         
         // 重新显示属性菜单
         return showAttrMenu(source);

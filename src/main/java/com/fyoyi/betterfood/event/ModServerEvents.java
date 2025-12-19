@@ -54,7 +54,7 @@ public class ModServerEvents {
                 for (Entity entity : serverLevel.getAllEntities()) {
                     if (entity instanceof ItemEntity itemEntity) {
                         ItemStack stack = itemEntity.getItem();
-                        
+
                         if (FoodConfig.canRot(stack)) {
                             if (TimeManager.DECAY_ENABLED && FreshnessHelper.isRotten(serverLevel, stack)) {
                                 // 根据食物点决定过期后变成什么
@@ -104,7 +104,7 @@ public class ModServerEvents {
 
     private static void checkAndReplace(net.minecraft.world.level.Level level, Slot slot) {
         ItemStack stack = slot.getItem();
-        
+
         if (FoodConfig.canRot(stack)) {
             if (TimeManager.DECAY_ENABLED && FreshnessHelper.isRotten(level, stack)) {
                 // 根据食物点决定过期后变成什么
@@ -119,7 +119,7 @@ public class ModServerEvents {
     private static void checkInventoryForRot(net.minecraft.world.level.Level level, Container container) {
         for (int i = 0; i < container.getContainerSize(); i++) {
             ItemStack stack = container.getItem(i);
-            
+
             if (FoodConfig.canRot(stack)) {
                 if (TimeManager.DECAY_ENABLED && FreshnessHelper.isRotten(level, stack)) {
                     // 根据食物点决定过期后变成什么
@@ -140,7 +140,7 @@ public class ModServerEvents {
      */
     private static ItemStack getRottenItemByTags(ItemStack stack) {
         Set<String> tags = FoodConfig.getFoodTags(stack);
-        
+
         // 检查分类属性
         for (String tag : tags) {
             if (tag.startsWith("分类:")) {
@@ -160,13 +160,13 @@ public class ModServerEvents {
                 }
             }
         }
-        
+
         // 默认变成腐肉
         return new ItemStack(Items.ROTTEN_FLESH, stack.getCount());
     }
 
     // ==========================================================
-    // 4. 堆叠逻辑 (最终修复版：右键差异合并)
+    // 4. 堆叠逻辑 (最终修复版：加入熟度检测)
     // ==========================================================
     @SubscribeEvent
     public static void onItemStackedOnOther(ItemStackedOnOtherEvent event) {
@@ -182,16 +182,24 @@ public class ModServerEvents {
                 FoodConfig.canRot(slotStack) &&
                 ItemStack.isSameItem(cursorStack, slotStack)) {
 
+            // >>> 【核心修改】检查熟度是否一致 <<<
+            // 如果熟度不一致，直接 return，禁止进入后续的新鲜度合并逻辑。
+            // 这样 Minecraft 原版机制就会因为 NBT 不同而禁止它们堆叠。
+            float cooked1 = cursorStack.hasTag() ? cursorStack.getTag().getFloat("BetterFood_CookedProgress") : 0f;
+            float cooked2 = slotStack.hasTag() ? slotStack.getTag().getFloat("BetterFood_CookedProgress") : 0f;
+
+            // 允许极小的浮点误差 (0.01)，如果差值过大，视为不同熟度
+            if (Math.abs(cooked1 - cooked2) > 0.01f) {
+                return;
+            }
+            // >>> 修改结束 <<<
+
             // 2. 如果新鲜度（NBT）完全一样
             if (ItemStack.isSameItemSameTags(cursorStack, slotStack)) {
-                // 直接返回！
-                // 左键 -> 原版会堆叠
-                // 右键 -> 原版会放 1 个
-                // 这符合你说的"一样就放一个"的要求
                 return;
             }
 
-            // --- 以下处理：新鲜度不同 (NBT不同) 的情况 ---
+            // --- 以下处理：新鲜度不同 (NBT不同) 但熟度相同的情况 ---
 
             // 3. 左键 (PRIMARY) -> 交换
             if (action == ClickAction.PRIMARY) {
@@ -209,8 +217,7 @@ public class ModServerEvents {
                 // 如果满了，不处理（原版通常也无反应）
                 if (space <= 0) return;
 
-                // >>> 核心修改：尽可能多放 (Math.min(cursor, space)) <<<
-                // 之前的错误是写成了 1，现在改成放全部！
+                // 核心修改：尽可能多放 (Math.min(cursor, space))
                 int amountToMove = Math.min(cursorStack.getCount(), space);
 
                 if (amountToMove > 0) {
@@ -251,12 +258,12 @@ public class ModServerEvents {
     private static boolean isSameFreshnessGrade(net.minecraft.world.level.Level level, ItemStack stack1, ItemStack stack2) {
         float percent1 = FreshnessHelper.getFreshnessPercentage(level, stack1);
         float percent2 = FreshnessHelper.getFreshnessPercentage(level, stack2);
-        
+
         // 根据新鲜度百分比判断所属等级
         // 0.8, 0.5, 0.3, 0.1
         return getFreshnessGrade(percent1) == getFreshnessGrade(percent2);
     }
-    
+
     /**
      * 根据新鲜度百分比获取新鲜度等级
      * @param percent 新鲜度百分比

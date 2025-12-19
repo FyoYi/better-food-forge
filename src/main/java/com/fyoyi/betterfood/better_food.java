@@ -14,9 +14,11 @@ import com.fyoyi.betterfood.item.ModItems;
 import com.fyoyi.betterfood.ModCreativeModeTabs;
 // ====================
 import com.fyoyi.betterfood.block.entity.ModBlockEntities;
-// === 【新增】导入渲染器相关类 ===
+// === 渲染器 & GUI ===
 import com.fyoyi.betterfood.client.renderer.PotRendererDispatcher;
+import com.fyoyi.betterfood.client.gui.PotInfoOverlay; // 【新增】导入你的 HUD Overlay
 import net.minecraftforge.client.event.EntityRenderersEvent;
+import net.minecraftforge.client.event.RegisterGuiOverlaysEvent; // 【新增】GUI 注册事件
 // =============================
 
 import net.minecraft.network.chat.Component;
@@ -65,34 +67,41 @@ public class better_food
     {
         IEventBus modEventBus = context.getModEventBus();
 
+        // 注册通用设置
         modEventBus.addListener(this::commonSetup);
+
+        // 注册方块、物品、实体等
+        ModBlocks.register(modEventBus);
+        ModItems.register(modEventBus);
+        ModBlockEntities.register(modEventBus);
+        ModCreativeModeTabs.register(modEventBus);
+
+        // 注册配置
+        context.registerConfig(ModConfig.Type.COMMON, Config.SPEC);
+
+        // ========================================================
+        // 客户端相关注册 (手动监听 Mod 总线事件)
+        // ========================================================
+
+        // 1. 注册物品栏装饰器 (新鲜度条)
+        modEventBus.addListener(ClientModEvents::registerItemDecorations);
+
+        // 2. 注册实体渲染器 (让锅里能显示物品 - TESR)
+        modEventBus.addListener(ClientModEvents::registerRenderers);
+
+        // 3. 【核心新增】注册 GUI Overlay (屏幕右侧的锅具信息)
+        modEventBus.addListener(ClientModEvents::registerGuiOverlays);
+
+
+        // ========================================================
+        // Forge 总线事件
+        // ========================================================
 
         // 注册服务端事件总线
         MinecraftForge.EVENT_BUS.register(this);
 
-        // 注册方块
-        ModBlocks.register(modEventBus);
-
-        // 注册物品
-        ModItems.register(modEventBus);
-
-        // 注册方块实体 (BlockEntity)
-        ModBlockEntities.register(modEventBus);
-
-        // 注册创造模式物品栏
-        ModCreativeModeTabs.register(modEventBus);
-
         // 注册资源重载监听器
         MinecraftForge.EVENT_BUS.addListener(this::addReloadListener);
-
-        // 手动注册物品栏装饰器 (画耐久条)
-        modEventBus.addListener(ClientModEvents::registerItemDecorations);
-
-        // >>> 【核心修复】手动注册实体渲染器 <<<
-        // 必须在这里注册，才能在模组加载时正确绑定渲染器
-        modEventBus.addListener(ClientModEvents::registerRenderers);
-
-        context.registerConfig(ModConfig.Type.COMMON, Config.SPEC);
     }
 
     private void commonSetup(final FMLCommonSetupEvent event)
@@ -116,6 +125,8 @@ public class better_food
 
     // =================================================================
     // 客户端事件内部类 (负责渲染和提示)
+    // 注解 bus = Bus.FORGE 是为了自动监听 ItemTooltipEvent
+    // 其他 Mod 总线事件(如渲染器注册)已在构造函数中手动绑定，互不冲突
     // =================================================================
     @Mod.EventBusSubscriber(modid = MOD_ID, value = Dist.CLIENT, bus = Mod.EventBusSubscriber.Bus.FORGE)
     public static class ClientModEvents
@@ -127,7 +138,7 @@ public class better_food
         }
 
         // ========================================================
-        // 【新增】注册方块实体渲染器 (让锅里能显示物品)
+        // 注册方块实体渲染器 (PotRendererDispatcher)
         // ========================================================
         public static void registerRenderers(EntityRenderersEvent.RegisterRenderers event) {
             // 使用调度器为不同类型的锅具选择合适的渲染器
@@ -135,7 +146,15 @@ public class better_food
         }
 
         // ========================================================
-        // 功能 1：Tooltip (显示保质期文字)
+        // 【新增】注册 GUI Overlay (PotInfoOverlay)
+        // ========================================================
+        public static void registerGuiOverlays(RegisterGuiOverlaysEvent event) {
+            // 注册到原版 HUD 之上，ID 为 "pot_info"
+            event.registerAboveAll("pot_info", PotInfoOverlay.INSTANCE);
+        }
+
+        // ========================================================
+        // 功能：Tooltip (显示保质期文字、标签等)
         // ========================================================
         @SubscribeEvent
         public static void onItemTooltip(net.minecraftforge.event.entity.player.ItemTooltipEvent event) {
@@ -291,14 +310,36 @@ public class better_food
                 Set<String> features = new HashSet<>();
                 String nature = null;
 
+                // === 【核心修改 1】检查是否有动态熟度 NBT ===
+                boolean hasDynamicCooked = false;
+                float dynamicCooked = 0f;
+                // NBT Key 必须与 PotBlockEntity 里的一致
+                if (stack.hasTag() && stack.getTag().contains("BetterFood_CookedProgress")) {
+                    dynamicCooked = stack.getTag().getFloat("BetterFood_CookedProgress");
+                    hasDynamicCooked = true;
+                }
+                // ===========================================
+
                 for (String tag : tags) {
                     if (tag.startsWith("分类:")) {
                         classification = tag.substring(3);
                     } else if (tag.startsWith("特点:")) {
                         features.add(tag.substring(3));
-                    } else if (tag.startsWith("性质:")) {
-                        nature = tag.substring(3);
+                    } else if (tag.startsWith("熟度:")) {
+                        // === 【核心修改 2】如果有动态熟度，覆盖静态配置 ===
+                        if (hasDynamicCooked) {
+                            // 动态显示：保留1位小数，例如 "50.5%"
+                            nature = String.format("%.1f%%", dynamicCooked);
+                        } else {
+                            // 静态显示：读取 JSON 配置 (如 "0%" 或 "70%")
+                            nature = tag.substring(3);
+                        }
                     }
+                }
+
+                // 如果 JSON 里没配熟度标签，但物品确实被煮过，也强制显示
+                if (nature == null && hasDynamicCooked) {
+                    nature = String.format("%.1f%%", dynamicCooked);
                 }
 
                 event.getToolTip().add(Component.literal("食物属性:").withStyle(ChatFormatting.AQUA));
@@ -316,13 +357,22 @@ public class better_food
                     event.getToolTip().add(Component.literal("特点: " + featuresStr.toString()).withStyle(ChatFormatting.GRAY));
                 }
                 if (nature != null) {
-                    event.getToolTip().add(Component.literal("性质: " + nature).withStyle(ChatFormatting.GRAY));
+                    // === 【核心修改 3】动态变色逻辑 ===
+                    ChatFormatting natureColor = ChatFormatting.GRAY;
+                    if (hasDynamicCooked) {
+                        if (dynamicCooked >= 100f) natureColor = ChatFormatting.RED;   // 熟了/焦了
+                        else if (dynamicCooked > 0f) natureColor = ChatFormatting.GREEN; // 正在煮
+                    }
+
+                    event.getToolTip().add(Component.literal("熟度: " + nature).withStyle(natureColor));
                 }
             }
         }
 
+        // ... 后面的 registerItemDecorations 等保持不变 ...
+
         // ========================================================
-        // 功能 2：渲染耐久条 (新鲜度条)
+        // 渲染耐久条 (新鲜度条)
         // ========================================================
         public static void registerItemDecorations(RegisterItemDecorationsEvent event) {
             for (Item item : ForgeRegistries.ITEMS) {

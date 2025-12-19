@@ -163,7 +163,7 @@ public class FoodExpiryManager extends SimpleJsonResourceReloadListener {
                         // 添加性质
                         if (itemObj.has("nature")) {
                             String nature = itemObj.get("nature").getAsString();
-                            attributes.add("性质:" + nature);
+                            attributes.add("熟度:" + nature);
                         }
                         
                         if (!attributes.isEmpty()) {
@@ -198,9 +198,9 @@ public class FoodExpiryManager extends SimpleJsonResourceReloadListener {
         Set<String> tags = new HashSet<>();
         tags.add("分类:肉类");
         tags.add("特点:怪物肉");
-        tags.add("性质:生食");
+        tags.add("熟度:0%");
         FoodConfig.registerTags(rottenFlesh, tags);
-        System.out.println("[BetterFood] 已为腐肉注册默认属性: 分类:肉类, 特点:怪物肉, 性质:生食");
+        System.out.println("[BetterFood] 已为腐肉注册默认属性: 分类:肉类, 特点:怪物肉, 熟度:0%");
     }
     
     private MobEffect parseEffect(String effectStr) {

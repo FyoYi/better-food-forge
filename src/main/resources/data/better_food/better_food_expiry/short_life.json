@@ -10,7 +10,7 @@
       "item": "minecraft:apple",
       "classification": "水果",
       "features": ["甜食"],
-      "nature": "生食",
+      "nature": "0%",
       "effects": [
         {"_comment": "饱和 概率 tick 强度", "effect": "saturation", "chance": 0.1, "duration": 2, "amplifier": 0},
         {"_comment": "生命恢复 概率 时间 强度", "effect": "regeneration", "chance": 0.0, "duration": 0, "amplifier": 0},
@@ -25,7 +25,7 @@
       "item": "minecraft:poisonous_potato",
       "classification": "蔬菜",
       "features": ["毒素"],
-      "nature": "生食",
+      "nature": "0%",
       "effects": [
         {"_comment": "饱和 概率 tick 强度", "effect": "saturation", "chance": 0.1, "duration": 2, "amplifier": 0},
         {"_comment": "生命恢复 概率 时间 强度", "effect": "regeneration", "chance": 0.0, "duration": 0, "amplifier": 0},

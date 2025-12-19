@@ -11,7 +11,7 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items; // 必须导入 Items
+import net.minecraft.world.item.Items;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
@@ -19,8 +19,8 @@ import net.minecraft.world.level.block.BaseEntityBlock;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.RenderShape;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.world.level.block.entity.BlockEntityTicker; // 必须导入
-import net.minecraft.world.level.block.entity.BlockEntityType; // 必须导入
+import net.minecraft.world.level.block.entity.BlockEntityTicker;
+import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.phys.BlockHitResult;
@@ -50,12 +50,9 @@ public class SimpleFoodBlock extends BaseEntityBlock {
         return new PotBlockEntity(pPos, pState);
     }
 
-    // === 【新增关键方法】 注册 Ticker，让 BlockEntity 能每帧运行 ===
     @Nullable
     @Override
     public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level pLevel, BlockState pState, BlockEntityType<T> pBlockEntityType) {
-        // 我们只需要在客户端运行动画逻辑，但通常为了保险双端都注册
-        // 这里的 createTickerHelper 会检查方块实体类型是否匹配
         return createTickerHelper(pBlockEntityType, ModBlockEntities.POT_BE.get(), PotBlockEntity::tick);
     }
 
@@ -68,14 +65,16 @@ public class SimpleFoodBlock extends BaseEntityBlock {
     public InteractionResult use(BlockState pState, Level pLevel, BlockPos pPos, Player pPlayer, InteractionHand pHand, BlockHitResult pHit) {
         if (pHand != InteractionHand.MAIN_HAND) return InteractionResult.PASS;
 
-        // 1. 蹲下拿锅逻辑
-        if (pPlayer.isShiftKeyDown() && pPlayer.getItemInHand(pHand).isEmpty()) {
+        ItemStack handStack = pPlayer.getItemInHand(pHand);
+
+        // 1. 蹲下拿锅
+        if (pPlayer.isShiftKeyDown() && handStack.isEmpty()) {
             if (!pLevel.isClientSide) {
                 ItemStack potItem = new ItemStack(this);
                 BlockEntity be = pLevel.getBlockEntity(pPos);
                 if (be instanceof PotBlockEntity pot) {
                     pot.saveToItem(potItem);
-                    pot.getItems().clear(); // 清空防止掉落
+                    pot.getItems().clear();
                 }
                 pLevel.removeBlock(pPos, false);
                 pPlayer.setItemInHand(pHand, potItem);
@@ -84,28 +83,22 @@ public class SimpleFoodBlock extends BaseEntityBlock {
             return InteractionResult.SUCCESS;
         }
 
-        // === 2. 【新增】用木棍翻炒逻辑 ===
-        ItemStack handStack = pPlayer.getItemInHand(pHand);
+        // 2. 木棍翻炒
         if (handStack.getItem() == Items.STICK) {
             BlockEntity be = pLevel.getBlockEntity(pPos);
             if (be instanceof PotBlockEntity pot) {
-                // 触发动画 (双端触发：客户端直接看动画，服务端保证逻辑一致)
                 pot.triggerFlip();
-
-                // 播放声音 (模拟炒菜声)
                 pLevel.playSound(pPlayer, pPos, SoundEvents.GENERIC_EXTINGUISH_FIRE, SoundSource.BLOCKS, 0.5F, 1.5F);
-
-                // 返回成功，挥动一下手
                 return InteractionResult.sidedSuccess(pLevel.isClientSide);
             }
         }
 
-        // 3. 正常放入/取出逻辑
+        // 3. 放入/取出逻辑
         if (!pLevel.isClientSide) {
             BlockEntity be = pLevel.getBlockEntity(pPos);
             if (be instanceof PotBlockEntity pot) {
-
                 if (!handStack.isEmpty()) {
+                    // === 【核心修复】必须是可食用的物品才能放入 ===
                     if (handStack.getItem().isEdible()) {
                         boolean success = pot.pushItem(handStack);
                         if (success) {

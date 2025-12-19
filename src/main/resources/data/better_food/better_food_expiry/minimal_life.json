@@ -8,7 +8,7 @@
       "item": "minecraft:spider_eye",
       "classification": "肉类",
       "features": ["怪物肉", "毒素"],
-      "nature": "生食",
+      "nature": "0%",
       "effects": [
         {"_comment": "饱和 概率 tick 强度", "effect": "saturation", "chance": 0.1, "duration": 2, "amplifier": 0},
         {"_comment": "生命恢复 概率 时间 强度", "effect": "regeneration", "chance": 0.0, "duration": 0, "amplifier": 0},
@@ -23,7 +23,7 @@
       "item": "minecraft:beef",
       "classification": "肉类",
       "features": ["牛肉"],
-      "nature": "生食",
+      "nature": "0%",
       "effects": [
         {"_comment": "饱和 概率 tick 强度", "effect": "saturation", "chance": 0.1, "duration": 2, "amplifier": 0},
         {"_comment": "生命恢复 概率 时间 强度", "effect": "regeneration", "chance": 0.0, "duration": 0, "amplifier": 0},
@@ -38,7 +38,7 @@
       "item": "minecraft:porkchop",
       "classification": "肉类",
       "features": ["猪肉"],
-      "nature": "生食",
+      "nature": "0%",
       "effects": [
         {"_comment": "饱和 概率 tick 强度", "effect": "saturation", "chance": 0.1, "duration": 2, "amplifier": 0},
         {"_comment": "生命恢复 概率 时间 强度", "effect": "regeneration", "chance": 0.0, "duration": 0, "amplifier": 0},
@@ -53,7 +53,7 @@
       "item": "minecraft:chicken",
       "classification": "肉类",
       "features": ["鸡肉"],
-      "nature": "生食",
+      "nature": "0%",
       "effects": [
         {"_comment": "饱和 概率 tick 强度", "effect": "saturation", "chance": 0.1, "duration": 2, "amplifier": 0},
         {"_comment": "生命恢复 概率 时间 强度", "effect": "regeneration", "chance": 0.0, "duration": 0, "amplifier": 0},
@@ -68,7 +68,7 @@
       "item": "minecraft:mutton",
       "classification": "肉类",
       "features": ["羊肉"],
-      "nature": "生食",
+      "nature": "0%",
       "effects": [
         {"_comment": "饱和 概率 tick 强度", "effect": "saturation", "chance": 0.1, "duration": 2, "amplifier": 0},
         {"_comment": "生命恢复 概率 时间 强度", "effect": "regeneration", "chance": 0.0, "duration": 0, "amplifier": 0},
@@ -83,7 +83,7 @@
       "item": "minecraft:rabbit",
       "classification": "肉类",
       "features": ["兔肉"],
-      "nature": "生食",
+      "nature": "0%",
       "effects": [
         {"_comment": "饱和 概率 tick 强度", "effect": "saturation", "chance": 0.1, "duration": 2, "amplifier": 0},
         {"_comment": "生命恢复 概率 时间 强度", "effect": "regeneration", "chance": 0.0, "duration": 0, "amplifier": 0},
@@ -97,8 +97,8 @@
       "_comment": "生鳕鱼",
       "item": "minecraft:cod",
       "classification": "鱼类",
-      "features": ["鳕鱼"],
-      "nature": "生食",
+      "features": [],
+      "nature": "0%",
       "effects": [
         {"_comment": "饱和 概率 tick 强度", "effect": "saturation", "chance": 0.1, "duration": 2, "amplifier": 0},
         {"_comment": "生命恢复 概率 时间 强度", "effect": "regeneration", "chance": 0.0, "duration": 0, "amplifier": 0},
@@ -113,7 +113,7 @@
       "item": "minecraft:salmon",
       "classification": "鱼类",
       "features": [],
-      "nature": "生食",
+      "nature": "0%",
       "effects": [
         {"_comment": "饱和 概率 tick 强度", "effect": "saturation", "chance": 0.1, "duration": 2, "amplifier": 0},
         {"_comment": "生命恢复 概率 时间 强度", "effect": "regeneration", "chance": 0.0, "duration": 0, "amplifier": 0},
@@ -128,7 +128,7 @@
       "item": "minecraft:tropical_fish",
       "classification": "鱼类",
       "features": [],
-      "nature": "生食",
+      "nature": "0%",
       "effects": [
         {"_comment": "饱和 概率 tick 强度", "effect": "saturation", "chance": 0.1, "duration": 2, "amplifier": 0},
         {"_comment": "生命恢复 概率 时间 强度", "effect": "regeneration", "chance": 0.0, "duration": 0, "amplifier": 0},
@@ -143,7 +143,7 @@
       "item": "minecraft:pufferfish",
       "classification": "鱼类",
       "features": ["毒素"],
-      "nature": "生食",
+      "nature": "0%",
       "effects": [
         {"_comment": "饱和 概率 tick 强度", "effect": "saturation", "chance": 0.1, "duration": 2, "amplifier": 0},
         {"_comment": "生命恢复 概率 时间 强度", "effect": "regeneration", "chance": 0.0, "duration": 0, "amplifier": 0},
@@ -158,7 +158,7 @@
       "item": "minecraft:spider_eye",
       "classification": "肉类",
       "features": ["怪物肉", "毒素"],
-      "nature": "生食",
+      "nature": "0%",
       "effects": [
         {"_comment": "饱和 概率 tick 强度", "effect": "saturation", "chance": 0.1, "duration": 2, "amplifier": 0},
         {"_comment": "生命恢复 概率 时间 强度", "effect": "regeneration", "chance": 0.0, "duration": 0, "amplifier": 0},

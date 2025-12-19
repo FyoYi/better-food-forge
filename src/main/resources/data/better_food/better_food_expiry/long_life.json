@@ -10,7 +10,7 @@
       "item": "minecraft:honey_bottle",
       "classification": "饮品",
       "features": ["甜食"],
-      "nature": "生食",
+      "nature": "0%",
       "effects": [
         {"_comment": "饱和 概率 tick 强度", "effect": "saturation", "chance": 0.3, "duration": 2, "amplifier": 0},
         {"_comment": "生命恢复 概率 时间 强度", "effect": "regeneration", "chance": 0.6, "duration": 5, "amplifier": 2},
@@ -25,7 +25,7 @@
       "item": "minecraft:golden_apple",
       "classification": "水果",
       "features": ["黄金"],
-      "nature": "生食",
+      "nature": "0%",
       "effects": [
         {"_comment": "饱和 概率 tick 强度", "effect": "saturation", "chance": 0.1, "duration": 2, "amplifier": 0},
         {"_comment": "生命恢复 概率 时间 强度", "effect": "regeneration", "chance": 0.0, "duration": 0, "amplifier": 0},
@@ -40,7 +40,7 @@
       "item": "minecraft:golden_carrot",
       "classification": "蔬菜",
       "features": ["黄金"],
-      "nature": "生食",
+      "nature": "0%",
       "effects": [
         {"_comment": "饱和 概率 tick 强度", "effect": "saturation", "chance": 0.1, "duration": 2, "amplifier": 0},
         {"_comment": "生命恢复 概率 时间 强度", "effect": "regeneration", "chance": 0.0, "duration": 0, "amplifier": 0},
@@ -55,7 +55,7 @@
       "item": "minecraft:chorus_fruit",
       "classification": "水果",
       "features": ["附魔"],
-      "nature": "生食",
+      "nature": "0%",
       "effects": [
         {"_comment": "饱和 概率 tick 强度", "effect": "saturation", "chance": 0.1, "duration": 2, "amplifier": 0},
         {"_comment": "生命恢复 概率 时间 强度", "effect": "regeneration", "chance": 0.0, "duration": 0, "amplifier": 0},

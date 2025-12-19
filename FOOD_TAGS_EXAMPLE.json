@@ -3,7 +3,7 @@
   "_comment2": "每个食物可以有以下三种属性：",
   "_comment3": "- 分类 (classification): 食物的基本类别，如蔬菜、水果、肉类等",
   "_comment4": "- 特点 (features): 食物的具体特征，可以有多个，如甜食、毒素等",
-  "_comment5": "- 性质 (nature): 食物的加工状态，如生食、熟食等",
+  "_comment5": "- 熟度 (nature): 食物的加工状态，如0%、70%等",
   
   "food_groups": {
     "example_group": {
@@ -14,7 +14,7 @@
           "item": "minecraft:apple",
           "classification": "水果",
           "features": ["甜食"],
-          "nature": "生食",
+          "nature": "0%",
           "effects": [
             {
               "_comment": "新鲜奖励效果配置",
@@ -54,7 +54,7 @@
   "_comment27": "- 黄金: golden_apple, golden_carrot等",
   "_comment28": "- 附魔: enchanted_golden_apple, chorus_fruit等",
   
-  "_comment29": "常见性质:",
-  "_comment30": "- 生食: 大多数原材料",
-  "_comment31": "- 熟食: 经过烹饪的食物"
+  "_comment29": "常见熟度:",
+  "_comment30": "- 0%: 大多数原材料",
+  "_comment31": "- 70%: 经过烹饪的食物"
 }

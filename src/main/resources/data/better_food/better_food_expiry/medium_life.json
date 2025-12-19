@@ -1,5 +1,5 @@
 {
-  "_comment": "中期保鲜食物 (240min)包含部分熟食，蔬菜",
+  "_comment": "中期保鲜食物 (240min)包含部分70%熟度食物，蔬菜",
   "_comment2": "支持的效果: saturation(饱和), regeneration(生命恢复), absorption(伤害吸收), fire_resistance(防火), water_breathing(水下呼吸), luck(幸运)",
   "_comment3": "参数说明 - effect:效果类型, chance:概率(0.0-1.0), duration:持续时间(秒,饱和用tick), amplifier:等级(0=I, 1=II, 2=III)",
 
@@ -10,7 +10,7 @@
       "item": "minecraft:bread",
       "classification": "谷物",
       "features": [],
-      "nature": "熟食",
+      "nature": "30%",
       "effects": [
         {"_comment": "饱和 概率 tick 强度", "effect": "saturation", "chance": 0.1, "duration": 2, "amplifier": 0},
         {"_comment": "生命恢复 概率 时间 强度", "effect": "regeneration", "chance": 0.0, "duration": 0, "amplifier": 0},
@@ -25,7 +25,7 @@
       "item": "minecraft:carrot",
       "classification": "蔬菜",
       "features": [],
-      "nature": "生食",
+      "nature": "0%",
       "effects": [
         {"_comment": "饱和 概率 tick 强度", "effect": "saturation", "chance": 0.1, "duration": 2, "amplifier": 0},
         {"_comment": "生命恢复 概率 时间 强度", "effect": "regeneration", "chance": 0.0, "duration": 0, "amplifier": 0},
@@ -40,7 +40,7 @@
       "item": "minecraft:potato",
       "classification": "蔬菜",
       "features": [],
-      "nature": "生食",
+      "nature": "0%",
       "effects": [
         {"_comment": "饱和 概率 tick 强度", "effect": "saturation", "chance": 0.1, "duration": 2, "amplifier": 0},
         {"_comment": "生命恢复 概率 时间 强度", "effect": "regeneration", "chance": 0.0, "duration": 0, "amplifier": 0},
@@ -55,7 +55,7 @@
       "item": "minecraft:baked_potato",
       "classification": "蔬菜",
       "features": [],
-      "nature": "熟食",
+      "nature": "70%",
       "effects": [
         {"_comment": "饱和 概率 tick 强度", "effect": "saturation", "chance": 0.1, "duration": 2, "amplifier": 0},
         {"_comment": "生命恢复 概率 时间 强度", "effect": "regeneration", "chance": 0.0, "duration": 0, "amplifier": 0},
@@ -70,7 +70,7 @@
       "item": "minecraft:beetroot",
       "classification": "蔬菜",
       "features": [],
-      "nature": "生食",
+      "nature": "0%",
       "effects": [
         {"_comment": "饱和 概率 tick 强度", "effect": "saturation", "chance": 0.1, "duration": 2, "amplifier": 0},
         {"_comment": "生命恢复 概率 时间 强度", "effect": "regeneration", "chance": 0.0, "duration": 0, "amplifier": 0},
@@ -85,7 +85,7 @@
       "item": "minecraft:beetroot_soup",
       "classification": "汤食",
       "features": [],
-      "nature": "熟食",
+      "nature": "70%",
       "effects": [
         {"_comment": "饱和 概率 tick 强度", "effect": "saturation", "chance": 0.1, "duration": 2, "amplifier": 0},
         {"_comment": "生命恢复 概率 时间 强度", "effect": "regeneration", "chance": 0.0, "duration": 0, "amplifier": 0},
@@ -100,7 +100,7 @@
       "item": "minecraft:cooked_porkchop",
       "classification": "肉类",
       "features": ["猪肉"],
-      "nature": "熟食",
+      "nature": "70%",
       "effects": [
         {"_comment": "饱和 概率 tick 强度", "effect": "saturation", "chance": 0.1, "duration": 2, "amplifier": 0},
         {"_comment": "生命恢复 概率 时间 强度", "effect": "regeneration", "chance": 0.0, "duration": 0, "amplifier": 0},
@@ -115,7 +115,7 @@
       "item": "minecraft:cooked_beef",
       "classification": "肉类",
       "features": ["牛肉"],
-      "nature": "熟食",
+      "nature": "70%",
       "effects": [
         {"_comment": "饱和 概率 tick 强度", "effect": "saturation", "chance": 0.1, "duration": 2, "amplifier": 0},
         {"_comment": "生命恢复 概率 时间 强度", "effect": "regeneration", "chance": 0.0, "duration": 0, "amplifier": 0},
@@ -130,7 +130,7 @@
       "item": "minecraft:cooked_chicken",
       "classification": "肉类",
       "features": ["鸡肉"],
-      "nature": "熟食",
+      "nature": "70%",
       "effects": [
         {"_comment": "饱和 概率 tick 强度", "effect": "saturation", "chance": 0.1, "duration": 2, "amplifier": 0},
         {"_comment": "生命恢复 概率 时间 强度", "effect": "regeneration", "chance": 0.0, "duration": 0, "amplifier": 0},
@@ -145,7 +145,7 @@
       "item": "minecraft:cooked_mutton",
       "classification": "肉类",
       "features": ["羊肉"],
-      "nature": "熟食",
+      "nature": "70%",
       "effects": [
         {"_comment": "饱和 概率 tick 强度", "effect": "saturation", "chance": 0.1, "duration": 2, "amplifier": 0},
         {"_comment": "生命恢复 概率 时间 强度", "effect": "regeneration", "chance": 0.0, "duration": 0, "amplifier": 0},
@@ -160,7 +160,7 @@
       "item": "minecraft:cooked_rabbit",
       "classification": "肉类",
       "features": ["兔肉"],
-      "nature": "熟食",
+      "nature": "70%",
       "effects": [
         {"_comment": "饱和 概率 tick 强度", "effect": "saturation", "chance": 0.1, "duration": 2, "amplifier": 0},
         {"_comment": "生命恢复 概率 时间 强度", "effect": "regeneration", "chance": 0.0, "duration": 0, "amplifier": 0},
@@ -175,7 +175,7 @@
       "item": "minecraft:rabbit_stew",
       "classification": "汤食",
       "features": ["兔肉"],
-      "nature": "熟食",
+      "nature": "70%",
       "effects": [
         {"_comment": "饱和 概率 tick 强度", "effect": "saturation", "chance": 0.1, "duration": 2, "amplifier": 0},
         {"_comment": "生命恢复 概率 时间 强度", "effect": "regeneration", "chance": 0.0, "duration": 0, "amplifier": 0},
@@ -190,7 +190,7 @@
       "item": "minecraft:cooked_cod",
       "classification": "鱼类",
       "features": [],
-      "nature": "熟食",
+      "nature": "70%",
       "effects": [
         {"_comment": "饱和 概率 tick 强度", "effect": "saturation", "chance": 0.1, "duration": 2, "amplifier": 0},
         {"_comment": "生命恢复 概率 时间 强度", "effect": "regeneration", "chance": 0.0, "duration": 0, "amplifier": 0},
@@ -205,7 +205,7 @@
       "item": "minecraft:cooked_salmon",
       "classification": "鱼类",
       "features": [],
-      "nature": "熟食",
+      "nature": "70%",
       "effects": [
         {"_comment": "饱和 概率 tick 强度", "effect": "saturation", "chance": 0.1, "duration": 2, "amplifier": 0},
         {"_comment": "生命恢复 概率 时间 强度", "effect": "regeneration", "chance": 0.0, "duration": 0, "amplifier": 0},
@@ -220,7 +220,7 @@
       "item": "minecraft:mushroom_stew",
       "classification": "汤食",
       "features": [],
-      "nature": "熟食",
+      "nature": "70%",
       "effects": [
         {"_comment": "饱和 概率 tick 强度", "effect": "saturation", "chance": 0.1, "duration": 2, "amplifier": 0},
         {"_comment": "生命恢复 概率 时间 强度", "effect": "regeneration", "chance": 0.0, "duration": 0, "amplifier": 0},
@@ -235,7 +235,7 @@
       "item": "minecraft:pumpkin_pie",
       "classification": "蔬菜",
       "features": ["甜食"],
-      "nature": "熟食",
+      "nature": "70%",
       "effects": [
         {"_comment": "饱和 概率 tick 强度", "effect": "saturation", "chance": 0.1, "duration": 2, "amplifier": 0},
         {"_comment": "生命恢复 概率 时间 强度", "effect": "regeneration", "chance": 0.0, "duration": 0, "amplifier": 0},
